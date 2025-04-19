@@ -15,6 +15,7 @@ func (object *ProviderService) RouterService() services_interface_router.RouterS
 			object.SymbolListRoute,
 			object.QuoteRoute,
 			object.ChartSettingsRoute,
+			object.BotRoute,
 		)
 	}
 

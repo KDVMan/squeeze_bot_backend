@@ -1,6 +1,7 @@
 package services_router
 
 import (
+	routes_interface_bot "backend/internal/routes/bot/interface"
 	routes_interface_chart_settings "backend/internal/routes/chart_settings/interface"
 	routes_interface_init "backend/internal/routes/init/interface"
 	routes_interface_quote "backend/internal/routes/quote/interface"
@@ -29,7 +30,7 @@ func NewRouterService(
 	symbolListRoute func() routes_interface_symbol_list.SymbolListRoute,
 	quoteRoute func() routes_interface_quote.QuoteRoute,
 	chartSettingsRoute func() routes_interface_chart_settings.ChartSettingsRoute,
-	// tradeRoute func() routes_trade_interface.TradeRoute,
+	botRoute func() routes_interface_bot.BotRoute,
 ) services_interface_router.RouterService {
 	router := chi.NewRouter()
 
@@ -63,7 +64,7 @@ func NewRouterService(
 		r.Mount("/symbol_list", symbolListRoute().GetRouter())
 		r.Mount("/quote", quoteRoute().GetRouter())
 		r.Mount("/chart_settings", chartSettingsRoute().GetRouter())
-		// r.Mount("/trade", tradeRoute().GetRouter())
+		r.Mount("/bot", botRoute().GetRouter())
 	})
 
 	return routerService

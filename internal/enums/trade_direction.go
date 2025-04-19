@@ -9,6 +9,10 @@ const (
 	TradeDirectionShort TradeDirection = "short"
 )
 
+func (enum TradeDirection) String() string {
+	return string(enum)
+}
+
 func TradeDirectionValidate(field validator.FieldLevel) bool {
 	if enum, ok := field.Field().Interface().(TradeDirection); ok {
 		return enum.TradeDirectionValid()

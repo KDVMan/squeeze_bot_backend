@@ -1,11 +1,13 @@
 package services_provider
 
 import (
+	routes_interface_bot "backend/internal/routes/bot/interface"
 	routes_interface_chart_settings "backend/internal/routes/chart_settings/interface"
 	routes_interface_init "backend/internal/routes/init/interface"
 	routes_interface_quote "backend/internal/routes/quote/interface"
 	routes_interface_symbol "backend/internal/routes/symbol/interface"
 	routes_interface_symbol_list "backend/internal/routes/symbol_list/interface"
+	services_interface_bot "backend/internal/services/bot/interface"
 	services_interface_chart_settings "backend/internal/services/chart_settings/interface"
 	services_interface_exchange "backend/internal/services/exchange/interface"
 	services_interface_exchange_limit "backend/internal/services/exchange_limit/interface"
@@ -43,7 +45,7 @@ type ProviderService struct {
 	symbolListRoute    routes_interface_symbol_list.SymbolListRoute
 	quoteRoute         routes_interface_quote.QuoteRoute
 	chartSettingsRoute routes_interface_chart_settings.ChartSettingsRoute
-	// tradeRoute                   routes_trade_interface.TradeRoute
+	botRoute           routes_interface_bot.BotRoute
 
 	// сервисы
 	websocketService         services_interface_websocket.WebsocketService
@@ -60,7 +62,7 @@ type ProviderService struct {
 	// calculatorFormulaPresetService services_calculator_formula_preset_interface.CalculatorFormulaPresetService
 	chartSettingsService services_interface_chart_settings.ChartSettingsService
 	userService          services_interface_user.UserService
-	// tradeService                   services_trade_interface.TradeService
+	botService           services_interface_bot.BotService
 	// tradeRepositoryService         services_trade_repository_interface.TradeRepositoryService
 }
 

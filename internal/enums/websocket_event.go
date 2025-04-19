@@ -8,4 +8,5 @@ const (
 	WebsocketEventCurrentPrice   WebsocketEvent = "currentPrice"
 	WebsocketEventUser           WebsocketEvent = "user"
 	WebsocketEventLeverage       WebsocketEvent = "leverage"
+	WebsocketEventBot            WebsocketEvent = "bot"
 )

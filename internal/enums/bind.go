@@ -2,7 +2,6 @@ package enums
 
 import (
 	"github.com/go-playground/validator/v10"
-	"math/rand"
 )
 
 type Bind string
@@ -16,43 +15,23 @@ const (
 	BindMoc   Bind = "moc"
 )
 
-func BindValues() []Bind {
-	return []Bind{
-		BindLow, BindHigh, BindOpen, BindClose, BindMhl, BindMoc,
-	}
-}
-
-func BindRandom(binds []Bind) Bind {
-	if len(binds) == 0 {
-		return ""
-	}
-
-	return binds[rand.Intn(len(binds))]
+func (enum Bind) String() string {
+	return string(enum)
 }
 
 func BindValidate(field validator.FieldLevel) bool {
-	binds, ok := field.Field().Interface().([]Bind)
-
-	if !ok {
-		return false
-	}
-
-	validBinds := BindValues()
-
-	for _, bind := range binds {
-		if !bindContains(validBinds, bind) {
-			return false
-		}
-	}
-	return true
-}
-
-func bindContains(s []Bind, e Bind) bool {
-	for _, a := range s {
-		if a == e {
-			return true
-		}
+	if enum, ok := field.Field().Interface().(Bind); ok {
+		return enum.BindValid()
 	}
 
 	return false
+}
+
+func (enum Bind) BindValid() bool {
+	switch enum {
+	case BindLow, BindHigh, BindOpen, BindClose, BindMhl, BindMoc:
+		return true
+	default:
+		return false
+	}
 }
