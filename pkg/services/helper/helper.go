@@ -1,0 +1,50 @@
+package services_helper
+
+import (
+	"crypto/md5"
+	"encoding/hex"
+	"math"
+	"strconv"
+)
+
+func MustConvertStringToFloat64(value string, valueDefault float64, base int) float64 {
+	if result, err := strconv.ParseFloat(value, base); err == nil {
+		return result
+	}
+
+	return valueDefault
+}
+
+func MustConvertByteToMd5(text []byte) string {
+	hash := md5.Sum(text)
+
+	return hex.EncodeToString(hash[:])
+}
+
+func MustConvertStringToMd5(text string) string {
+	return MustConvertByteToMd5([]byte(text))
+}
+
+func GetPercentFromMinMax(min float64, max float64, fix int) float64 {
+	if min == 0 {
+		return 0
+	}
+
+	result := ((max / min) * 100) - 100
+
+	if fix > 0 {
+		return Round(result, fix)
+	}
+
+	return result
+}
+
+func Round(value float64, decimal int) float64 {
+	if decimal == 0 {
+		return math.Round(value)
+	}
+
+	multiplier := math.Pow(10, float64(decimal))
+
+	return math.Round(value*multiplier) / multiplier
+}
