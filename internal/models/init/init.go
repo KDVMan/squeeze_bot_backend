@@ -18,6 +18,7 @@ type InitModel struct {
 	Precision        int                       `json:"precision"`
 	LeverageLevel    int                       `json:"leverageLevel"`
 	LeverageType     enums_symbol.LeverageType `json:"leverageType"`
+	BotID            int                       `json:"botID"`
 	BotSortColumn    enums_bot.SortColumn      `json:"botSortColumn"`
 	BotSortDirection enums.SortDirection       `json:"botSortDirection"`
 }
@@ -34,6 +35,7 @@ func LoadDefault() *InitModel {
 		Precision:        2,
 		LeverageLevel:    0,
 		LeverageType:     enums_symbol.LeverageTypeUnknown,
+		BotID:            0,
 		BotSortColumn:    enums_bot.SortColumnSymbol,
 		BotSortDirection: enums.SortDirectionAsc,
 	}

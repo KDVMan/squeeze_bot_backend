@@ -16,6 +16,7 @@ func (object *initServiceImplementation) Update(request *models_init.UpdateReque
 
 	initModel.Symbol = request.Symbol
 	initModel.Intervals = request.Intervals
+	initModel.BotID = request.BotID
 	initModel.BotSortColumn = request.BotSortColumn
 	initModel.BotSortDirection = request.BotSortDirection
 
