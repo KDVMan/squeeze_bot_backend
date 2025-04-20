@@ -12,6 +12,7 @@ func (object *ProviderService) WebsocketService() services_interface_websocket.W
 			object.ExchangeLimitService,
 			object.SymbolService,
 			object.UserService,
+			object.BotService,
 		)
 	}
 

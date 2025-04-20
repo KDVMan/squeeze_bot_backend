@@ -2,6 +2,7 @@ package services_websocket
 
 import (
 	models_channel "backend/internal/models/channel"
+	services_interface_bot "backend/internal/services/bot/interface"
 	services_interface_exchange_limit "backend/internal/services/exchange_limit/interface"
 	services_interface_symbol "backend/internal/services/symbol/interface"
 	services_interface_user "backend/internal/services/user/interface"
@@ -16,6 +17,7 @@ type websocketServiceImplementation struct {
 	exchangeLimitService func() services_interface_exchange_limit.ExchangeLimitService
 	symbolService        func() services_interface_symbol.SymbolService
 	userService          func() services_interface_user.UserService
+	botService           func() services_interface_bot.BotService
 	connections          map[services_interface_websocket_connection.WebsocketConnectionService]bool
 	registerChannel      chan services_interface_websocket_connection.WebsocketConnectionService
 	unregisterChannel    chan services_interface_websocket_connection.WebsocketConnectionService
@@ -29,12 +31,14 @@ func NewWebsocketService(
 	exchangeLimitService func() services_interface_exchange_limit.ExchangeLimitService,
 	symbolService func() services_interface_symbol.SymbolService,
 	userService func() services_interface_user.UserService,
+	botService func() services_interface_bot.BotService,
 ) services_interface_websocket.WebsocketService {
 	return &websocketServiceImplementation{
 		loggerService:        loggerService,
 		exchangeLimitService: exchangeLimitService,
 		symbolService:        symbolService,
 		userService:          userService,
+		botService:           botService,
 		connections:          make(map[services_interface_websocket_connection.WebsocketConnectionService]bool),
 		registerChannel:      make(chan services_interface_websocket_connection.WebsocketConnectionService, 1000),
 		unregisterChannel:    make(chan services_interface_websocket_connection.WebsocketConnectionService, 1000),

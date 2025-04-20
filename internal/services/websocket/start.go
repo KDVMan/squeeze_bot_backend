@@ -1,5 +1,10 @@
 package services_websocket
 
+import (
+	"backend/internal/enums"
+	models_channel "backend/internal/models/channel"
+)
+
 func (object *websocketServiceImplementation) Start() {
 	object.loggerService().Info().Printf("starting websocket service")
 
@@ -15,6 +20,11 @@ func (object *websocketServiceImplementation) Start() {
 			go object.broadcastSymbols()
 			go object.broadcastExchangeLimits()
 			go object.userService().Load()
+
+			object.broadcastChannel <- &models_channel.BroadcastChannelModel{
+				Event: enums.WebsocketEventBot,
+				Data:  object.botService().Load(),
+			}
 		case connection := <-object.unregisterChannel:
 			object.lock.Lock()
 

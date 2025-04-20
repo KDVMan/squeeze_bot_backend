@@ -68,7 +68,7 @@ func (object *botServiceImplementation) Start(request *models_bot.StartRequestMo
 
 	object.websocketService().GetBroadcastChannel() <- &models_channel.BroadcastChannelModel{
 		Event: enums.WebsocketEventBot,
-		// Data:  object.tradeRepository().GetAll(),
+		Data:  object.Load(),
 	}
 
 	return nil

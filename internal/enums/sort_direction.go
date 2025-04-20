@@ -9,6 +9,10 @@ const (
 	SortDirectionDesc SortDirection = "desc"
 )
 
+func (enum SortDirection) String() string {
+	return string(enum)
+}
+
 func SortDirectionValidate(field validator.FieldLevel) bool {
 	if enum, ok := field.Field().Interface().(SortDirection); ok {
 		return enum.SortDirectionValid()

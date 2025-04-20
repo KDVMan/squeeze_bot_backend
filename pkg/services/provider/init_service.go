@@ -11,8 +11,7 @@ func (object *ProviderService) InitService() services_interface_init.InitService
 			object.StorageService,
 			object.WebsocketService,
 			object.SymbolService,
-			// object.CalculatorService,
-			// object.CalculatorPresetService,
+			object.BotService,
 		)
 	}
 

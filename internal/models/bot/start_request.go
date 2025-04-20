@@ -12,5 +12,5 @@ type StartRequestModel struct {
 	PercentIn      float64              `json:"percentIn" validate:"required,gt=0"`
 	PercentOut     float64              `json:"percentOut" validate:"required,gt=0"`
 	StopTime       int64                `json:"stopTime" validate:"gte=0"`
-	StopPercent    float64              `json:"stopPercent" validate:"required,gte=0"`
+	StopPercent    float64              `json:"stopPercent" validate:"gte=0"`
 }

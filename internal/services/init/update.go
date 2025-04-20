@@ -16,6 +16,8 @@ func (object *initServiceImplementation) Update(request *models_init.UpdateReque
 
 	initModel.Symbol = request.Symbol
 	initModel.Intervals = request.Intervals
+	initModel.BotSortColumn = request.BotSortColumn
+	initModel.BotSortDirection = request.BotSortDirection
 
 	symbolModel, err := object.symbolService().Load(request.Symbol, enums_symbol.SymbolStatusActive)
 	if err != nil {
@@ -37,6 +39,11 @@ func (object *initServiceImplementation) Update(request *models_init.UpdateReque
 			Level: symbolModel.Leverage.Level,
 			Type:  symbolModel.Leverage.Type,
 		},
+	}
+
+	object.websocketService().GetBroadcastChannel() <- &models_channel.BroadcastChannelModel{
+		Event: enums.WebsocketEventBot,
+		Data:  object.botService().Load(),
 	}
 
 	return initModel, nil
