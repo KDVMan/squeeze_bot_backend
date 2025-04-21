@@ -22,8 +22,8 @@ func (object *websocketServiceImplementation) Start() {
 			go object.userService().Load()
 
 			object.broadcastChannel <- &models_channel.BroadcastChannelModel{
-				Event: enums.WebsocketEventBot,
-				Data:  object.botService().Load(),
+				Event: enums.WebsocketEventBotList,
+				Data:  object.botService().LoadAll(),
 			}
 		case connection := <-object.unregisterChannel:
 			object.lock.Lock()

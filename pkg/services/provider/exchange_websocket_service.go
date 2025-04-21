@@ -11,10 +11,10 @@ func (object *ProviderService) ExchangeWebsocketService() services_interface_exc
 			object.LoggerService,
 			object.SymbolService,
 			object.QuoteService,
-			// object.QuoteRepositoryService,
+			object.QuoteRepositoryService,
 			object.ExchangeService,
 			object.UserService,
-			// object.TradeService,
+			object.BotService,
 		)
 	}
 

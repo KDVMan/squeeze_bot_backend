@@ -5,7 +5,12 @@ import (
 )
 
 type BotService interface {
-	Start(*models_bot.StartRequestModel) error
-	Load() []*models_bot.BotModel
+	Add(*models_bot.AddRequestModel) error
+	LoadAll() []*models_bot.BotModel
+	LoadByHash(string) *models_bot.BotModel
 	Status(*models_bot.StatusRequestModel) error
+	RunChannel()
+	GetRunChannel() chan *models_bot.BotModel
+	RunDealChannel()
+	GetDealChannel() chan string
 }

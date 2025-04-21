@@ -15,10 +15,13 @@ type BotModel struct {
 	Interval       enums.Interval       `json:"interval"`
 	TradeDirection enums.TradeDirection `json:"tradeDirection"`
 	Window         int                  `gorm:"default:0" json:"window"`
+	LimitQuotes    int64                `json:"limitQuotes"`
 	PrevParam      BotParamModel        `gorm:"embedded;embeddedPrefix:prev_param_" json:"prevParam"`
 	CurrentParam   BotParamModel        `gorm:"embedded;embeddedPrefix:current_param_" json:"currentParam"`
 	NextParam      BotParamModel        `gorm:"embedded;embeddedPrefix:next_param_" json:"nextParam"`
+	TickSize       float64              `json:"tickSize"`
 	Status         enums_bot.Status     `json:"status"`
+	InDeal         bool                 `json:"inDeal"`
 }
 
 func (BotModel) TableName() string {

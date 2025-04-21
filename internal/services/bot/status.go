@@ -2,6 +2,7 @@ package services_bot
 
 import (
 	"backend/internal/enums"
+	enums_bot "backend/internal/enums/bot"
 	models_bot "backend/internal/models/bot"
 	models_channel "backend/internal/models/channel"
 )
@@ -22,7 +23,11 @@ func (object *botServiceImplementation) Status(request *models_bot.StatusRequest
 
 	object.websocketService().GetBroadcastChannel() <- &models_channel.BroadcastChannelModel{
 		Event: enums.WebsocketEventBot,
-		Data:  object.Load(),
+		Data:  object.LoadByHash(botModel.Hash),
+	}
+
+	if botModel.Status == enums_bot.StatusAdd {
+		object.GetRunChannel() <- &botModel
 	}
 
 	return nil

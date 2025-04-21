@@ -6,6 +6,6 @@ type ExchangeWebSocketService interface {
 	Start()
 	Stop()
 	SubscribeCurrentPrice(string, enums.Interval)
-	SubscribeTrade(string)
-	UnsubscribeTrade(string)
+	SubscribeSymbol(string)
+	UnsubscribeSymbol(string)
 }

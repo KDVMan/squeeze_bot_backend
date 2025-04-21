@@ -6,7 +6,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func (object *botServiceImplementation) Load() []*models_bot.BotModel {
+func (object *botServiceImplementation) LoadAll() []*models_bot.BotModel {
 	var botsModels []*models_bot.BotModel
 
 	initModel, err := object.initService().Load()

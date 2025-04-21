@@ -5,8 +5,9 @@ import "github.com/go-playground/validator/v10"
 type QuoteType string
 
 const (
-	QuoteTypeInit QuoteType = "init"
-	QuoteTypeLoad QuoteType = "load"
+	QuoteTypeInit  QuoteType = "init"
+	QuoteTypeLoad  QuoteType = "load"
+	QuoteTypeRange QuoteType = "range"
 )
 
 func QuoteTypeValidate(field validator.FieldLevel) bool {
@@ -19,7 +20,7 @@ func QuoteTypeValidate(field validator.FieldLevel) bool {
 
 func (enum QuoteType) QuoteTypeValid() bool {
 	switch enum {
-	case QuoteTypeInit, QuoteTypeLoad:
+	case QuoteTypeInit, QuoteTypeLoad, QuoteTypeRange:
 		return true
 	default:
 		return false

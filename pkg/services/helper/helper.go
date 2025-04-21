@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"math"
 	"strconv"
+	"time"
 )
 
 func MustConvertStringToFloat64(value string, valueDefault float64, base int) float64 {
@@ -47,4 +48,18 @@ func Round(value float64, decimal int) float64 {
 	multiplier := math.Pow(10, float64(decimal))
 
 	return math.Round(value*multiplier) / multiplier
+}
+
+func Floor(value float64, decimal int) float64 {
+	if decimal == 0 {
+		return math.Floor(value)
+	}
+
+	multiplier := math.Pow(10, float64(decimal))
+
+	return math.Floor(value*multiplier) / multiplier
+}
+
+func MustConvertUnixMillisecondsToString(value int64) string {
+	return time.UnixMilli(value).Format("02.01.2006 15:04:05.000")
 }

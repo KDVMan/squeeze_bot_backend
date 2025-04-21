@@ -10,34 +10,36 @@ import (
 
 type QuoteModel struct {
 	models.DbModel
-	Hash            string            `gorm:"uniqueIndex:unique_quote_01;not null" json:"-"`
-	Symbol          string            `json:"symbol"`
-	Interval        enums.Interval    `json:"interval"`
-	TimeOpen        int64             `gorm:"uniqueIndex:unique_quote_01;not null" json:"timeOpen"`
-	TimeClose       int64             `json:"timeClose"`
-	PriceOpen       float64           `json:"priceOpen"`
-	PriceHigh       float64           `json:"priceHigh"`
-	PriceLow        float64           `json:"priceLow"`
-	PriceClose      float64           `json:"priceClose"`
-	VolumeLeft      float64           `json:"volumeLeft"`
-	VolumeRight     float64           `json:"volumeRight"`
-	VolumePrice     float64           `json:"volumePrice"`
-	VolumeBuyLeft   float64           `json:"volumeBuyLeft"`
-	VolumeBuyRight  float64           `json:"volumeBuyRight"`
-	VolumeBuyPrice  float64           `json:"volumeBuyPrice"`
-	VolumeSellLeft  float64           `json:"volumeSellLeft"`
-	VolumeSellRight float64           `json:"volumeSellRight"`
-	VolumeSellPrice float64           `json:"volumeSellPrice"`
-	BodySize        float64           `json:"bodySize"`
-	StickUpSize     float64           `json:"stickUpSize"`
-	StickDownSize   float64           `json:"stickDownSize"`
-	StickRatio      float64           `json:"stickRatio"`
-	CandleSize      float64           `json:"candleSize"`
-	CandleBodyRange float64           `json:"candleBodyRange"`
-	Trades          int64             `json:"trades"`
-	Direction       enums.Direction   `json:"direction"`
-	Percent         QuotePercentModel `gorm:"embedded;embeddedPrefix:percent_" json:"percent"`
-	IsClosed        bool              `json:"isClosed"`
+	Hash               string            `gorm:"uniqueIndex:unique_quote_01;not null" json:"-"`
+	Symbol             string            `json:"symbol"`
+	Interval           enums.Interval    `json:"interval"`
+	TimeOpen           int64             `gorm:"uniqueIndex:unique_quote_01;not null" json:"timeOpen"`
+	TimeClose          int64             `json:"timeClose"`
+	PriceOpen          float64           `json:"priceOpen"`
+	PriceHigh          float64           `json:"priceHigh"`
+	PriceLow           float64           `json:"priceLow"`
+	PriceClose         float64           `json:"priceClose"`
+	VolumeLeft         float64           `json:"volumeLeft"`
+	VolumeRight        float64           `json:"volumeRight"`
+	VolumePrice        float64           `json:"volumePrice"`
+	VolumeBuyLeft      float64           `json:"volumeBuyLeft"`
+	VolumeBuyRight     float64           `json:"volumeBuyRight"`
+	VolumeBuyPrice     float64           `json:"volumeBuyPrice"`
+	VolumeSellLeft     float64           `json:"volumeSellLeft"`
+	VolumeSellRight    float64           `json:"volumeSellRight"`
+	VolumeSellPrice    float64           `json:"volumeSellPrice"`
+	BodySize           float64           `json:"bodySize"`
+	StickUpSize        float64           `json:"stickUpSize"`
+	StickDownSize      float64           `json:"stickDownSize"`
+	StickRatio         float64           `json:"stickRatio"`
+	CandleSize         float64           `json:"candleSize"`
+	CandleBodyRange    float64           `json:"candleBodyRange"`
+	Trades             int64             `json:"trades"`
+	Direction          enums.Direction   `json:"direction"`
+	Percent            QuotePercentModel `gorm:"embedded;embeddedPrefix:percent_" json:"percent"`
+	IsClosed           bool              `json:"isClosed"`
+	TimeOpenFormatted  string            `gorm:"-" json:"timeOpenFormatted"`
+	TimeCloseFormatted string            `gorm:"-" json:"timeCloseFormatted"`
 }
 
 func (QuoteModel) TableName() string {
@@ -96,34 +98,36 @@ func KlineToQuote(hash string, symbol string, interval enums.Interval, kline *fu
 	}
 
 	return &QuoteModel{
-		Hash:            hash,
-		Symbol:          symbol,
-		Interval:        interval,
-		TimeOpen:        kline.OpenTime,
-		TimeClose:       kline.CloseTime,
-		PriceOpen:       priceOpen,
-		PriceHigh:       priceHigh,
-		PriceLow:        priceLow,
-		PriceClose:      priceClose,
-		VolumeLeft:      volumeLeft,
-		VolumeRight:     volumeRight,
-		VolumePrice:     volumePrice,
-		VolumeBuyLeft:   volumeBuyLeft,
-		VolumeBuyRight:  volumeBuyRight,
-		VolumeBuyPrice:  volumeBuyPrice,
-		VolumeSellLeft:  volumeSellLeft,
-		VolumeSellRight: volumeSellRight,
-		VolumeSellPrice: volumeSellPrice,
-		BodySize:        bodySize,
-		StickUpSize:     stickUpSize,
-		StickDownSize:   stickDownSize,
-		StickRatio:      stickRatio,
-		CandleSize:      candleSize,
-		CandleBodyRange: candleBodyRange,
-		Trades:          kline.TradeNum,
-		Direction:       direction,
-		Percent:         GetPercent(direction, priceOpen, priceHigh, priceLow, priceClose, 2),
-		IsClosed:        true,
+		Hash:               hash,
+		Symbol:             symbol,
+		Interval:           interval,
+		TimeOpen:           kline.OpenTime,
+		TimeClose:          kline.CloseTime,
+		PriceOpen:          priceOpen,
+		PriceHigh:          priceHigh,
+		PriceLow:           priceLow,
+		PriceClose:         priceClose,
+		VolumeLeft:         volumeLeft,
+		VolumeRight:        volumeRight,
+		VolumePrice:        volumePrice,
+		VolumeBuyLeft:      volumeBuyLeft,
+		VolumeBuyRight:     volumeBuyRight,
+		VolumeBuyPrice:     volumeBuyPrice,
+		VolumeSellLeft:     volumeSellLeft,
+		VolumeSellRight:    volumeSellRight,
+		VolumeSellPrice:    volumeSellPrice,
+		BodySize:           bodySize,
+		StickUpSize:        stickUpSize,
+		StickDownSize:      stickDownSize,
+		StickRatio:         stickRatio,
+		CandleSize:         candleSize,
+		CandleBodyRange:    candleBodyRange,
+		Trades:             kline.TradeNum,
+		Direction:          direction,
+		Percent:            GetPercent(direction, priceOpen, priceHigh, priceLow, priceClose, 2),
+		IsClosed:           true,
+		TimeOpenFormatted:  services_helper.MustConvertUnixMillisecondsToString(kline.OpenTime),
+		TimeCloseFormatted: services_helper.MustConvertUnixMillisecondsToString(kline.CloseTime),
 	}
 }
 

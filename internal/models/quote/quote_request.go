@@ -6,11 +6,9 @@ import (
 )
 
 type QuoteRequestModel struct {
-	Symbol      string         `json:"symbol" validate:"required,alphanum,uppercase"`
-	Interval    enums.Interval `json:"interval" validate:"required,interval"`
-	QuotesLimit int            `json:"quotesLimit" validate:"required,gt=0"`
-	// TimeStart   int64                 `json:"-"` // нужно для загрузки calculate
-	TimeEnd int64 `json:"timeEnd" validate:"gte=0"`
-	// Index       int64                 `json:"index" validate:"gte=0"`
-	Type enums_quote.QuoteType `json:"type" validate:"required,quoteType"`
+	Symbol      string
+	Interval    enums.Interval
+	QuotesLimit int
+	TimeEnd     int64
+	Type        enums_quote.QuoteType
 }

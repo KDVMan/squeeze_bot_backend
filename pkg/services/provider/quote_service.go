@@ -8,6 +8,7 @@ import (
 func (object *ProviderService) QuoteService() services_quote_interface.QuoteService {
 	if object.quoteService == nil {
 		object.quoteService = services_quote.NewQuoteService(
+			object.LoggerService,
 			object.StorageService,
 			object.WebsocketService,
 			object.ExchangeService,

@@ -36,7 +36,6 @@ func (object *quoteServiceImplementation) Load(request *models_quote.QuoteReques
 		}
 	}
 
-	// response.TimeFrom = request.TimeStart
 	response.TimeTo = request.TimeEnd
 	response.Quotes = quotes
 

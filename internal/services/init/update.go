@@ -43,8 +43,8 @@ func (object *initServiceImplementation) Update(request *models_init.UpdateReque
 	}
 
 	object.websocketService().GetBroadcastChannel() <- &models_channel.BroadcastChannelModel{
-		Event: enums.WebsocketEventBot,
-		Data:  object.botService().Load(),
+		Event: enums.WebsocketEventBotList,
+		Data:  object.botService().LoadAll(),
 	}
 
 	return initModel, nil

@@ -2,7 +2,7 @@ package models_bot
 
 import "backend/internal/enums"
 
-type StartRequestModel struct {
+type AddRequestModel struct {
 	Deposit        float64              `json:"deposit" validate:"required,gt=0"`
 	IsReal         bool                 `json:"isReal"`
 	Symbol         string               `json:"symbol" validate:"required"`
@@ -13,4 +13,5 @@ type StartRequestModel struct {
 	PercentOut     float64              `json:"percentOut" validate:"required,gt=0"`
 	StopTime       int64                `json:"stopTime" validate:"gte=0"`
 	StopPercent    float64              `json:"stopPercent" validate:"gte=0"`
+	LimitQuotes    int64                `json:"limitQuotes" validate:"required,gt=0"`
 }

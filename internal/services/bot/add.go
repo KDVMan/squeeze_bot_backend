@@ -12,7 +12,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func (object *botServiceImplementation) Start(request *models_bot.StartRequestModel) error {
+func (object *botServiceImplementation) Add(request *models_bot.AddRequestModel) error {
 	var botModel models_bot.BotModel
 
 	hash := services_helper.MustConvertStringToMd5(
@@ -47,6 +47,7 @@ func (object *botServiceImplementation) Start(request *models_bot.StartRequestMo
 		Symbol:         symbolModel.Symbol,
 		Interval:       request.Interval,
 		TradeDirection: request.TradeDirection,
+		LimitQuotes:    request.LimitQuotes,
 		PrevParam:      models_bot.BotParamModel{},
 		CurrentParam: models_bot.BotParamModel{
 			Bind:        request.Bind,
@@ -56,20 +57,20 @@ func (object *botServiceImplementation) Start(request *models_bot.StartRequestMo
 			StopPercent: request.StopPercent,
 		},
 		NextParam: models_bot.BotParamModel{},
-		Status:    enums_bot.StatusStart,
+		TickSize:  symbolModel.Limit.TickSize,
+		Status:    enums_bot.StatusAdd,
 	}
 
 	if err = object.storageService().DB().Create(&botModel).Error; err != nil {
 		return err
 	}
 
-	// object.tradeRepository().Add(&tradeModel)
-	// object.exchangeWebsocketService().SubscribeTrade(request.Symbol)
-
 	object.websocketService().GetBroadcastChannel() <- &models_channel.BroadcastChannelModel{
-		Event: enums.WebsocketEventBot,
-		Data:  object.Load(),
+		Event: enums.WebsocketEventBotList,
+		Data:  object.LoadAll(),
 	}
+
+	object.GetRunChannel() <- object.LoadByHash(hash)
 
 	return nil
 }

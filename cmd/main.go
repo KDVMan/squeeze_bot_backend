@@ -14,7 +14,7 @@ import (
 
 func init() {
 	futures.WebsocketKeepalive = true
-	futures.WebsocketTimeout = 2 * time.Minute
+	futures.WebsocketTimeout = time.Second * 600
 }
 
 func main() {
@@ -35,7 +35,8 @@ func run(providerService *services_provider.ProviderService, parentCtx context.C
 
 	providerService.LoggerService().Info().Printf("starting server: %s", providerService.ConfigService().GetConfig().HttpServer.Address)
 
-	// go providerService.TradeService().RunDealChannel()
+	go providerService.BotService().RunDealChannel()
+	go providerService.BotService().RunChannel()
 	go providerService.WebsocketService().Start()
 	go providerService.ExchangeWebsocketService().Start()
 

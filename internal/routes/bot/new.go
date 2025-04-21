@@ -27,7 +27,7 @@ func NewBotRoute(
 		botService:     botService,
 	}
 
-	route.router.Post("/start", route.start())
+	route.router.Post("/add", route.add())
 	route.router.Post("/status", route.status())
 
 	return route

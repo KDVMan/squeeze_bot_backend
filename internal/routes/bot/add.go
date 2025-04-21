@@ -6,9 +6,9 @@ import (
 	"net/http"
 )
 
-func (object *botRouteImplementation) start() http.HandlerFunc {
+func (object *botRouteImplementation) add() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var request models_bot.StartRequestModel
+		var request models_bot.AddRequestModel
 
 		if err := object.requestService().Decode(w, r, &request); err != nil {
 			return
@@ -18,8 +18,8 @@ func (object *botRouteImplementation) start() http.HandlerFunc {
 			return
 		}
 
-		if err := object.botService().Start(&request); err != nil {
-			message := "failed to start bot"
+		if err := object.botService().Add(&request); err != nil {
+			message := "failed to add bot"
 			object.loggerService().Error().Printf("%s: %v", message, err)
 
 			render.Status(r, http.StatusInternalServerError)
