@@ -40,6 +40,14 @@ func (object *botServiceImplementation) Add(request *models_bot.AddRequestModel)
 		return err
 	}
 
+	tickSizeFactor := 0
+	tickSize := symbolModel.Limit.TickSize
+
+	for tickSize < 1 {
+		tickSize *= 10
+		tickSizeFactor++
+	}
+
 	botModel = models_bot.BotModel{
 		Hash:           hash,
 		Deposit:        request.Deposit,
@@ -56,9 +64,10 @@ func (object *botServiceImplementation) Add(request *models_bot.AddRequestModel)
 			StopTime:    request.StopTime,
 			StopPercent: request.StopPercent,
 		},
-		NextParam: models_bot.BotParamModel{},
-		TickSize:  symbolModel.Limit.TickSize,
-		Status:    enums_bot.StatusAdd,
+		NextParam:      models_bot.BotParamModel{},
+		Multiplier:     models_bot.GetMultiplier(request.TradeDirection),
+		TickSizeFactor: tickSizeFactor,
+		Status:         enums_bot.StatusAdd,
 	}
 
 	if err = object.storageService().DB().Create(&botModel).Error; err != nil {

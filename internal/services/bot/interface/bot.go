@@ -13,4 +13,6 @@ type BotService interface {
 	GetRunChannel() chan *models_bot.BotModel
 	RunDealChannel()
 	GetDealChannel() chan string
+	RunAddDealChannel()
+	GetAddDealChannel() chan *models_bot.BotModel
 }

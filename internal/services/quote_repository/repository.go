@@ -38,20 +38,24 @@ func (object *quoteRepositoryServiceImplementation) UpdateQuote(symbol string, i
 	} else {
 		if len(quotesModels) >= 1440 {
 			quotesModels = quotesModels[1:]
+			quotesModels[len(quotesModels)-1].IsClosed = true
 		}
 
 		currentCandle = &models_quote.QuoteModel{
-			Symbol:     symbol,
-			Interval:   interval,
-			TimeOpen:   candleOpenTime,
-			TimeClose:  candleCloseTime,
-			PriceOpen:  price,
-			PriceHigh:  price,
-			PriceLow:   price,
-			PriceClose: price,
-			VolumeLeft: 0,
-			Trades:     0,
-			IsClosed:   false,
+			Symbol:             symbol,
+			Interval:           interval,
+			TimeOpen:           candleOpenTime,
+			TimeClose:          candleCloseTime,
+			Price:              price,
+			PriceOpen:          price,
+			PriceHigh:          price,
+			PriceLow:           price,
+			PriceClose:         price,
+			VolumeLeft:         0,
+			Trades:             0,
+			IsClosed:           false,
+			TimeOpenFormatted:  services_helper.MustConvertUnixMillisecondsToString(candleOpenTime),
+			TimeCloseFormatted: services_helper.MustConvertUnixMillisecondsToString(candleCloseTime),
 		}
 
 		quotesModels = append(quotesModels, currentCandle)
@@ -65,15 +69,12 @@ func (object *quoteRepositoryServiceImplementation) UpdateQuote(symbol string, i
 		currentCandle.PriceLow = price
 	}
 
+	currentCandle.Price = price
 	currentCandle.PriceClose = price
-
-	if tradeTime > currentCandle.TimeClose {
-		currentCandle.IsClosed = true
-	}
 
 	object.data[symbol] = quotesModels
 
-	// fmt.Printf(
+	// log.Printf(
 	// 	"UPDATE, symbol: %s | time: %s | openTime: %s, closeTime: %s, closed: %v\n",
 	// 	symbol,
 	// 	services_helper.MustConvertUnixMillisecondsToString(trade.TradeTime),

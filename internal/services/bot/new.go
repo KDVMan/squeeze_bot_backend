@@ -30,6 +30,8 @@ type botServiceImplementation struct {
 	botRepositoryService     func() services_interface_bot_repository.BotRepositoryService
 	runChannel               chan *models_bot.BotModel
 	dealChannel              chan string
+	addDealChannel           chan *models_bot.BotModel
+	commission               float64
 }
 
 func NewBotService(
@@ -59,5 +61,7 @@ func NewBotService(
 		botRepositoryService:     botRepositoryService,
 		runChannel:               make(chan *models_bot.BotModel, 1000000),
 		dealChannel:              make(chan string, 1000000),
+		addDealChannel:           make(chan *models_bot.BotModel, 1000000),
+		commission:               configService().GetConfig().Binance.FuturesCommission,
 	}
 }

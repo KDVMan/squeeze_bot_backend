@@ -19,9 +19,10 @@ type BotModel struct {
 	PrevParam      BotParamModel        `gorm:"embedded;embeddedPrefix:prev_param_" json:"prevParam"`
 	CurrentParam   BotParamModel        `gorm:"embedded;embeddedPrefix:current_param_" json:"currentParam"`
 	NextParam      BotParamModel        `gorm:"embedded;embeddedPrefix:next_param_" json:"nextParam"`
-	TickSize       float64              `json:"tickSize"`
+	Multiplier     BotMultiplierModel   `gorm:"embedded;embeddedPrefix:multiplier_" json:"multiplier"`
+	TickSizeFactor int                  `json:"tickSizeFactor"`
 	Status         enums_bot.Status     `json:"status"`
-	InDeal         bool                 `json:"inDeal"`
+	Deal           BotDealModel         `gorm:"embedded;embeddedPrefix:deal_" json:"deal"`
 }
 
 func (BotModel) TableName() string {

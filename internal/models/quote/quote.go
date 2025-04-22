@@ -15,6 +15,7 @@ type QuoteModel struct {
 	Interval           enums.Interval    `json:"interval"`
 	TimeOpen           int64             `gorm:"uniqueIndex:unique_quote_01;not null" json:"timeOpen"`
 	TimeClose          int64             `json:"timeClose"`
+	Price              float64           `json:"price"`
 	PriceOpen          float64           `json:"priceOpen"`
 	PriceHigh          float64           `json:"priceHigh"`
 	PriceLow           float64           `json:"priceLow"`
