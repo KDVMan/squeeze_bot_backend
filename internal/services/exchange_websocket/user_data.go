@@ -24,6 +24,8 @@ func (object *exchangeWebsocketServiceImplementation) userData() {
 				object.dumpService().Dump(event)
 
 				if event.Event == futures.UserDataEventTypeAccountUpdate {
+					log.Println("event", event)
+
 					for _, balance := range event.AccountUpdate.Balances {
 						if balance.Asset == "USDT" {
 							if amount, err := strconv.ParseFloat(balance.ChangeBalance, 64); err == nil {

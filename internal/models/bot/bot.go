@@ -8,6 +8,7 @@ import (
 
 type BotModel struct {
 	models.DbModelWithID
+	OrderID         string               `json:"orderID"`
 	Hash            string               `gorm:"uniqueIndex:unique_bot_01;not null" json:"-"`
 	Deposit         float64              `json:"deposit"`
 	IsReal          bool                 `json:"isReal"`

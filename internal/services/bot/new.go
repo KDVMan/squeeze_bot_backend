@@ -5,6 +5,7 @@ import (
 	services_interface_bot "backend/internal/services/bot/interface"
 	services_interface_bot_repository "backend/internal/services/bot_repository/interface"
 	services_interface_exchange "backend/internal/services/exchange/interface"
+	services_interface_exchange_order "backend/internal/services/exchange_order/interface"
 	services_interface_exchange_websocket "backend/internal/services/exchange_websocket/interface"
 	services_interface_init "backend/internal/services/init/interface"
 	services_interface_quote "backend/internal/services/quote/interface"
@@ -25,6 +26,7 @@ type botServiceImplementation struct {
 	dumpService              func() services_interface_dump.DumpService
 	exchangeService          func() services_interface_exchange.ExchangeService
 	exchangeWebsocketService func() services_interface_exchange_websocket.ExchangeWebSocketService
+	exchangeOrderService     func() services_interface_exchange_order.ExchangeOrderService
 	initService              func() services_interface_init.InitService
 	symbolService            func() services_interface_symbol.SymbolService
 	quoteService             func() services_interface_quote.QuoteService
@@ -44,6 +46,7 @@ func NewBotService(
 	dumpService func() services_interface_dump.DumpService,
 	exchangeService func() services_interface_exchange.ExchangeService,
 	exchangeWebsocketService func() services_interface_exchange_websocket.ExchangeWebSocketService,
+	exchangeOrderService func() services_interface_exchange_order.ExchangeOrderService,
 	initService func() services_interface_init.InitService,
 	symbolService func() services_interface_symbol.SymbolService,
 	quoteService func() services_interface_quote.QuoteService,
@@ -58,6 +61,7 @@ func NewBotService(
 		dumpService:              dumpService,
 		exchangeService:          exchangeService,
 		exchangeWebsocketService: exchangeWebsocketService,
+		exchangeOrderService:     exchangeOrderService,
 		initService:              initService,
 		symbolService:            symbolService,
 		quoteService:             quoteService,

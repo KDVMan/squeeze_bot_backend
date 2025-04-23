@@ -71,8 +71,8 @@ func (object *botServiceImplementation) RunDealChannel() {
 							Data:  botModel,
 						}
 
-						if err := object.exchangeService().Limit(botModel, botModel.Deal.PreparationPriceIn, amount); err != nil {
-							object.loggerService().Error().Printf("failed to open limit: %v", err)
+						if err := object.exchangeOrderService().AddOrder(botModel, botModel.Deal.PreparationPriceIn, amount); err != nil {
+							object.loggerService().Error().Printf("failed to add order: %v", err)
 						}
 					}()
 				}

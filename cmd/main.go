@@ -38,6 +38,7 @@ func run(providerService *services_provider.ProviderService, parentCtx context.C
 	go providerService.BotService().RunAddDealChannel()
 	go providerService.BotService().RunDealChannel()
 	go providerService.BotService().RunChannel()
+	go providerService.ExchangeOrderService().Start()
 	go providerService.WebsocketService().Start()
 	go providerService.ExchangeWebsocketService().Start()
 

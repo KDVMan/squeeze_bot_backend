@@ -15,6 +15,7 @@ func (object *ProviderService) BotService() services_interface_bot.BotService {
 			object.DumpService,
 			object.ExchangeService,
 			object.ExchangeWebsocketService,
+			object.ExchangeOrderService,
 			object.InitService,
 			object.SymbolService,
 			object.QuoteService,

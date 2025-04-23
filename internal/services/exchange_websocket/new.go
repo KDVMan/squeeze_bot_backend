@@ -24,6 +24,8 @@ type exchangeWebsocketServiceImplementation struct {
 	userService             func() services_interface_user.UserService
 	botService              func() services_interface_bot.BotService
 	dumpService             func() services_interface_dump.DumpService
+	apiKey                  string
+	apiSecret               string
 	currentPriceSymbol      string
 	currentPriceInterval    enums.Interval
 	currentPriceStopChannel chan struct{}

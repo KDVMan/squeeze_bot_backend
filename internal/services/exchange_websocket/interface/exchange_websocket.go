@@ -1,6 +1,8 @@
 package services_interface_exchange_websocket
 
-import "backend/internal/enums"
+import (
+	"backend/internal/enums"
+)
 
 type ExchangeWebSocketService interface {
 	Start()
