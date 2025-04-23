@@ -10,10 +10,13 @@ func (object *botServiceImplementation) RunAddDealChannel() {
 	for botModel := range object.addDealChannel {
 		dealModel := &models_deal.DealModel{
 			BotID:         botModel.ID,
+			IsReal:        botModel.IsReal,
 			TimeIn:        botModel.Deal.TimeIn,
 			TimeOut:       botModel.Deal.TimeOut,
 			PriceIn:       botModel.Deal.PriceIn,
+			AmountIn:      botModel.Deal.AmountIn,
 			PriceOut:      botModel.Deal.PriceOut,
+			AmountOut:     botModel.Deal.AmountOut,
 			IsStopTime:    botModel.Deal.IsStopTime,
 			IsStopPercent: botModel.Deal.IsStopPercent,
 			ProfitPercent: object.calculateProfit(botModel),

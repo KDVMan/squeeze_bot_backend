@@ -1,6 +1,7 @@
 package services_interface_exchange
 
 import (
+	models_bot "backend/internal/models/bot"
 	"github.com/adshao/go-binance/v2/futures"
 )
 
@@ -12,4 +13,5 @@ type ExchangeService interface {
 	GetListenKey() (string, error)
 	DeleteListenKey() error
 	Leverage() ([]*futures.PositionRisk, error)
+	Limit(*models_bot.BotModel, float64, float64) error
 }

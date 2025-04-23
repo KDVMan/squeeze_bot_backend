@@ -39,6 +39,7 @@ type QuoteModel struct {
 	Direction          enums.Direction   `json:"direction"`
 	Percent            QuotePercentModel `gorm:"embedded;embeddedPrefix:percent_" json:"percent"`
 	IsClosed           bool              `json:"isClosed"`
+	IsLoad             bool              `json:"isLoad"` // индикатор что это загруженные свечи (т.е. только запустили бота), при подписке этого параметра не будет
 	TimeOpenFormatted  string            `gorm:"-" json:"timeOpenFormatted"`
 	TimeCloseFormatted string            `gorm:"-" json:"timeCloseFormatted"`
 }

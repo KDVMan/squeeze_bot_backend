@@ -10,6 +10,7 @@ func (object *ProviderService) ExchangeService() services_exchange_interface.Exc
 		object.exchangeService = services_exchange.NewExchangeService(
 			object.ConfigService,
 			object.StorageService,
+			object.DumpService,
 			object.ExchangeLimitService,
 		)
 	}

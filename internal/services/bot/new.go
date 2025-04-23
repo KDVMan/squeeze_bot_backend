@@ -4,6 +4,7 @@ import (
 	models_bot "backend/internal/models/bot"
 	services_interface_bot "backend/internal/services/bot/interface"
 	services_interface_bot_repository "backend/internal/services/bot_repository/interface"
+	services_interface_exchange "backend/internal/services/exchange/interface"
 	services_interface_exchange_websocket "backend/internal/services/exchange_websocket/interface"
 	services_interface_init "backend/internal/services/init/interface"
 	services_interface_quote "backend/internal/services/quote/interface"
@@ -22,6 +23,7 @@ type botServiceImplementation struct {
 	storageService           func() services_interface_storage.StorageService
 	websocketService         func() services_interface_websocket.WebsocketService
 	dumpService              func() services_interface_dump.DumpService
+	exchangeService          func() services_interface_exchange.ExchangeService
 	exchangeWebsocketService func() services_interface_exchange_websocket.ExchangeWebSocketService
 	initService              func() services_interface_init.InitService
 	symbolService            func() services_interface_symbol.SymbolService
@@ -40,6 +42,7 @@ func NewBotService(
 	storageService func() services_interface_storage.StorageService,
 	websocketService func() services_interface_websocket.WebsocketService,
 	dumpService func() services_interface_dump.DumpService,
+	exchangeService func() services_interface_exchange.ExchangeService,
 	exchangeWebsocketService func() services_interface_exchange_websocket.ExchangeWebSocketService,
 	initService func() services_interface_init.InitService,
 	symbolService func() services_interface_symbol.SymbolService,
@@ -53,6 +56,7 @@ func NewBotService(
 		storageService:           storageService,
 		websocketService:         websocketService,
 		dumpService:              dumpService,
+		exchangeService:          exchangeService,
 		exchangeWebsocketService: exchangeWebsocketService,
 		initService:              initService,
 		symbolService:            symbolService,

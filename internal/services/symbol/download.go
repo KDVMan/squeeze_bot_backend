@@ -93,16 +93,25 @@ func getLimit(data futures.Symbol) models_symbol.SymbolLimitModel {
 	decimal := strings.Split(step, ".")
 
 	if len(decimal) > 1 {
-		limitModel.LeftPrecision = int(len(decimal[1]))
+		limitModel.LeftPrecision = len(decimal[1])
+	} else {
+		limitModel.LeftPrecision = 0
 	}
 
 	notionalFilter := data.MinNotionalFilter()
-
 	limitModel.RightMin, _ = strconv.ParseFloat(notionalFilter.Notional, 64)
 	limitModel.RightMax = 0
-
 	limitModel.Precision = data.PricePrecision
 	limitModel.TickSize, _ = strconv.ParseFloat(data.PriceFilter().TickSize, 64)
+
+	tick := strconv.FormatFloat(limitModel.TickSize, 'f', -1, 64)
+	decimalTick := strings.Split(tick, ".")
+
+	if len(decimalTick) > 1 {
+		limitModel.PricePrecision = len(decimalTick[1])
+	} else {
+		limitModel.PricePrecision = 0
+	}
 
 	return limitModel
 }

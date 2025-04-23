@@ -2,6 +2,7 @@ package services_exchange_websocket
 
 import (
 	"github.com/adshao/go-binance/v2/futures"
+	"log"
 	"strconv"
 	"time"
 )
@@ -19,6 +20,9 @@ func (object *exchangeWebsocketServiceImplementation) userData() {
 		doneChannel, stopChannel, err := futures.WsUserDataServe(
 			listenKey,
 			func(event *futures.WsUserDataEvent) {
+				log.Println("event", event.Event)
+				object.dumpService().Dump(event)
+
 				if event.Event == futures.UserDataEventTypeAccountUpdate {
 					for _, balance := range event.AccountUpdate.Balances {
 						if balance.Asset == "USDT" {

@@ -64,10 +64,12 @@ func (object *botServiceImplementation) Add(request *models_bot.AddRequestModel)
 			StopTime:    request.StopTime,
 			StopPercent: request.StopPercent,
 		},
-		NextParam:      models_bot.BotParamModel{},
-		Multiplier:     models_bot.GetMultiplier(request.TradeDirection),
-		TickSizeFactor: tickSizeFactor,
-		Status:         enums_bot.StatusAdd,
+		NextParam:       models_bot.BotParamModel{},
+		Multiplier:      models_bot.GetMultiplier(request.TradeDirection),
+		TickSizeFactor:  tickSizeFactor,
+		AmountPrecision: symbolModel.Limit.LeftPrecision,
+		PricePrecision:  symbolModel.Limit.PricePrecision,
+		Status:          enums_bot.StatusAdd,
 	}
 
 	if err = object.storageService().DB().Create(&botModel).Error; err != nil {

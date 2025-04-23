@@ -19,6 +19,9 @@ func (object *botServiceImplementation) RunChannel() {
 			continue
 		}
 
+		// что бы в репозиторий статус попал нормальный
+		botModel.Status = enums_bot.StatusRun
+
 		object.quoteRepositoryService().Add(botModel.Symbol, quotes)
 		object.exchangeWebsocketService().SubscribeSymbol(botModel.Symbol)
 		object.botRepositoryService().Add(botModel)

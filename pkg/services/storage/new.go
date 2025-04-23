@@ -3,6 +3,7 @@ package services_storage
 import (
 	models_bot "backend/internal/models/bot"
 	models_chart_settings "backend/internal/models/chart_settings"
+	models_deal "backend/internal/models/deal"
 	models_exchange_limit "backend/internal/models/exchange_limit"
 	models_init "backend/internal/models/init"
 	models_quote "backend/internal/models/quote"
@@ -53,6 +54,7 @@ func NewStorageService(configService func() services_interface_config.ConfigServ
 		&models_quote.QuoteModel{},
 		&models_chart_settings.ChartSettings{},
 		&models_bot.BotModel{},
+		&models_deal.DealModel{},
 	)
 
 	if err != nil {

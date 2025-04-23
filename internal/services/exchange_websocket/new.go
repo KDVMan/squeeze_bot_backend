@@ -9,6 +9,7 @@ import (
 	services_interface_quote_repository "backend/internal/services/quote_repository/interface"
 	services_interface_symbol "backend/internal/services/symbol/interface"
 	services_interface_user "backend/internal/services/user/interface"
+	services_interface_dump "backend/pkg/services/dump/interface"
 	services_interface_logger "backend/pkg/services/logger/interface"
 	"sync"
 	"time"
@@ -22,6 +23,7 @@ type exchangeWebsocketServiceImplementation struct {
 	exchangeService         func() services_interface_exchange.ExchangeService
 	userService             func() services_interface_user.UserService
 	botService              func() services_interface_bot.BotService
+	dumpService             func() services_interface_dump.DumpService
 	currentPriceSymbol      string
 	currentPriceInterval    enums.Interval
 	currentPriceStopChannel chan struct{}
@@ -40,6 +42,7 @@ func NewExchangeWebsocketService(
 	exchangeService func() services_interface_exchange.ExchangeService,
 	userService func() services_interface_user.UserService,
 	botService func() services_interface_bot.BotService,
+	dumpService func() services_interface_dump.DumpService,
 ) services_interface_exchange_websocket.ExchangeWebSocketService {
 	return &exchangeWebsocketServiceImplementation{
 		loggerService:           loggerService,
@@ -49,6 +52,7 @@ func NewExchangeWebsocketService(
 		exchangeService:         exchangeService,
 		userService:             userService,
 		botService:              botService,
+		dumpService:             dumpService,
 		currentPriceStopChannel: nil,
 		currentPriceMutex:       sync.Mutex{},
 		doneChannel:             make(chan struct{}),

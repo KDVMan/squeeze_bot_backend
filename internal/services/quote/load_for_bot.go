@@ -28,6 +28,8 @@ func (object *quoteServiceImplementation) LoadForBot(request *models_quote.Quote
 			quote.IsClosed = false
 		}
 
+		quote.IsLoad = true // индикатор для бота (что бы не входить в сделку если мы уже провафлили вход)
+
 		quotes = append(quotes, quote)
 	}
 
