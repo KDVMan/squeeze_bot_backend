@@ -49,14 +49,14 @@ func (QuoteModel) TableName() string {
 }
 
 func KlineToQuote(hash string, symbol string, interval enums.Interval, kline *futures.Kline) *QuoteModel {
-	priceOpen := services_helper.MustConvertStringToFloat64(kline.Open, 0, 64)
-	priceHigh := services_helper.MustConvertStringToFloat64(kline.High, 0, 64)
-	priceLow := services_helper.MustConvertStringToFloat64(kline.Low, 0, 64)
-	priceClose := services_helper.MustConvertStringToFloat64(kline.Close, 0, 64)
-	volumeLeft := services_helper.MustConvertStringToFloat64(kline.Volume, 0, 64)
-	volumeRight := services_helper.MustConvertStringToFloat64(kline.QuoteAssetVolume, 0, 64)
-	volumeBuyLeft := services_helper.MustConvertStringToFloat64(kline.TakerBuyBaseAssetVolume, 0, 64)
-	volumeBuyRight := services_helper.MustConvertStringToFloat64(kline.TakerBuyQuoteAssetVolume, 0, 64)
+	priceOpen := services_helper.MustConvertStringToFloat64(kline.Open)
+	priceHigh := services_helper.MustConvertStringToFloat64(kline.High)
+	priceLow := services_helper.MustConvertStringToFloat64(kline.Low)
+	priceClose := services_helper.MustConvertStringToFloat64(kline.Close)
+	volumeLeft := services_helper.MustConvertStringToFloat64(kline.Volume)
+	volumeRight := services_helper.MustConvertStringToFloat64(kline.QuoteAssetVolume)
+	volumeBuyLeft := services_helper.MustConvertStringToFloat64(kline.TakerBuyBaseAssetVolume)
+	volumeBuyRight := services_helper.MustConvertStringToFloat64(kline.TakerBuyQuoteAssetVolume)
 	volumeSellLeft := volumeLeft - volumeBuyLeft
 	volumeSellRight := volumeRight - volumeBuyRight
 	bodySize := math.Abs(priceOpen - priceClose)
@@ -134,14 +134,14 @@ func KlineToQuote(hash string, symbol string, interval enums.Interval, kline *fu
 }
 
 func WsKlineToQuote(hash string, symbol string, interval enums.Interval, kline futures.WsKline) *QuoteModel {
-	priceOpen := services_helper.MustConvertStringToFloat64(kline.Open, 0, 64)
-	priceHigh := services_helper.MustConvertStringToFloat64(kline.High, 0, 64)
-	priceLow := services_helper.MustConvertStringToFloat64(kline.Low, 0, 64)
-	priceClose := services_helper.MustConvertStringToFloat64(kline.Close, 0, 64)
-	volumeLeft := services_helper.MustConvertStringToFloat64(kline.Volume, 0, 64)
-	volumeRight := services_helper.MustConvertStringToFloat64(kline.QuoteVolume, 0, 64)
-	volumeBuyLeft := services_helper.MustConvertStringToFloat64(kline.ActiveBuyVolume, 0, 64)
-	volumeBuyRight := services_helper.MustConvertStringToFloat64(kline.ActiveBuyQuoteVolume, 0, 64)
+	priceOpen := services_helper.MustConvertStringToFloat64(kline.Open)
+	priceHigh := services_helper.MustConvertStringToFloat64(kline.High)
+	priceLow := services_helper.MustConvertStringToFloat64(kline.Low)
+	priceClose := services_helper.MustConvertStringToFloat64(kline.Close)
+	volumeLeft := services_helper.MustConvertStringToFloat64(kline.Volume)
+	volumeRight := services_helper.MustConvertStringToFloat64(kline.QuoteVolume)
+	volumeBuyLeft := services_helper.MustConvertStringToFloat64(kline.ActiveBuyVolume)
+	volumeBuyRight := services_helper.MustConvertStringToFloat64(kline.ActiveBuyQuoteVolume)
 	volumeSellLeft := volumeLeft - volumeBuyLeft
 	volumeSellRight := volumeRight - volumeBuyRight
 	bodySize := math.Abs(priceOpen - priceClose)

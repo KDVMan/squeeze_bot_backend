@@ -15,6 +15,7 @@ import (
 	services_interface_exchange_order "backend/internal/services/exchange_order/interface"
 	services_interface_exchange_websocket "backend/internal/services/exchange_websocket/interface"
 	services_interface_init "backend/internal/services/init/interface"
+	services_interface_order "backend/internal/services/order/interface"
 	services_interface_quote "backend/internal/services/quote/interface"
 	services_interface_quote_repository "backend/internal/services/quote_repository/interface"
 	services_interface_symbol "backend/internal/services/symbol/interface"
@@ -67,6 +68,7 @@ type ProviderService struct {
 	userService              services_interface_user.UserService
 	botService               services_interface_bot.BotService
 	botRepositoryService     services_interface_bot_repository.BotRepositoryService
+	orderService             services_interface_order.OrderService
 }
 
 func NewProviderService(parentCtx context.Context) *ProviderService {

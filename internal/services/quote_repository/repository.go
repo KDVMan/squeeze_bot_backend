@@ -25,7 +25,7 @@ func (object *quoteRepositoryServiceImplementation) UpdateQuote(symbol string, i
 		return
 	}
 
-	price := services_helper.MustConvertStringToFloat64(trade.Price, 0, 64)
+	price := services_helper.MustConvertStringToFloat64(trade.Price)
 	intervalMs := enums.IntervalMilliseconds(interval)
 	tradeTime := trade.TradeTime
 	candleOpenTime := (tradeTime / intervalMs) * intervalMs

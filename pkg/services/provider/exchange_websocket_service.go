@@ -14,6 +14,7 @@ func (object *ProviderService) ExchangeWebsocketService() services_interface_exc
 			object.QuoteRepositoryService,
 			object.ExchangeService,
 			object.UserService,
+			object.OrderService,
 			object.BotService,
 			object.DumpService,
 		)

@@ -7,9 +7,11 @@ import (
 	services_interface_config "backend/pkg/services/config/interface"
 	services_interface_dump "backend/pkg/services/dump/interface"
 	services_interface_storage "backend/pkg/services/storage/interface"
+	"fmt"
 	"github.com/adshao/go-binance/v2"
 	"github.com/adshao/go-binance/v2/futures"
 	"net/http"
+	"time"
 )
 
 type exchangeServiceImplementation struct {
@@ -42,4 +44,8 @@ func NewExchangeService(
 		listenKey:            "",
 		stopRenewListenKey:   nil,
 	}
+}
+
+func (object *exchangeServiceImplementation) getOrderID(id uint) string {
+	return fmt.Sprintf("order-%d-%d", id, time.Now().UnixNano())
 }

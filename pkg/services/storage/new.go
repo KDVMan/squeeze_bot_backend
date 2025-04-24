@@ -6,9 +6,11 @@ import (
 	models_deal "backend/internal/models/deal"
 	models_exchange_limit "backend/internal/models/exchange_limit"
 	models_init "backend/internal/models/init"
+	models_order "backend/internal/models/order"
 	models_quote "backend/internal/models/quote"
 	models_symbol "backend/internal/models/symbol"
 	models_symbol_list "backend/internal/models/symbol_list"
+	models_user "backend/internal/models/user"
 	services_interface_config "backend/pkg/services/config/interface"
 	services_interface_storage "backend/pkg/services/storage/interface"
 	"gorm.io/driver/sqlite"
@@ -55,6 +57,8 @@ func NewStorageService(configService func() services_interface_config.ConfigServ
 		&models_chart_settings.ChartSettings{},
 		&models_bot.BotModel{},
 		&models_deal.DealModel{},
+		&models_user.UserModel{},
+		&models_order.OrderModel{},
 	)
 
 	if err != nil {

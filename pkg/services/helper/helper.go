@@ -3,17 +3,27 @@ package services_helper
 import (
 	"crypto/md5"
 	"encoding/hex"
+	"github.com/shopspring/decimal"
 	"math"
 	"strconv"
 	"time"
 )
 
-func MustConvertStringToFloat64(value string, valueDefault float64, base int) float64 {
-	if result, err := strconv.ParseFloat(value, base); err == nil {
+func MustConvertStringToFloat64(value string) float64 {
+	if result, err := strconv.ParseFloat(value, 64); err == nil {
 		return result
 	}
 
-	return valueDefault
+	return 0
+}
+
+func MustConvertStringToDecimal(value string) decimal.Decimal {
+	d, err := decimal.NewFromString(value)
+	if err != nil {
+		return decimal.Zero
+	}
+
+	return d
 }
 
 func MustConvertByteToMd5(text []byte) string {

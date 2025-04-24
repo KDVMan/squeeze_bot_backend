@@ -6,12 +6,13 @@ import (
 )
 
 type ExchangeService interface {
-	UserBalance() (float64, float64, error)
+	UserBalance() (float64, error)
 	UserHedge() (bool, error)
 	ExchangeInfo() ([]futures.Symbol, error)
 	Kline(string, string, int64, int) ([]*futures.Kline, error)
 	GetListenKey() (string, error)
 	DeleteListenKey() error
 	Leverage() ([]*futures.PositionRisk, error)
-	Limit(*models_bot.BotModel, float64, float64) error
+	AddLimit(*models_bot.BotModel, float64, float64) error
+	UpdateLimit(*models_bot.BotModel, float64, float64) error
 }

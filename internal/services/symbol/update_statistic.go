@@ -24,11 +24,11 @@ func (object *symbolServiceImplementation) UpdateStatistic(tickets []*futures.Ws
 			}
 
 			symbolModel.Statistic = models_symbol.SymbolStatisticModel{
-				Price:        service_helper.MustConvertStringToFloat64(ticket.ClosePrice, 0, 64),
-				PriceLow:     service_helper.MustConvertStringToFloat64(ticket.LowPrice, 0, 64),
-				PriceHigh:    service_helper.MustConvertStringToFloat64(ticket.HighPrice, 0, 64),
-				PricePercent: service_helper.MustConvertStringToFloat64(ticket.PriceChangePercent, 0, 64),
-				Volume:       service_helper.MustConvertStringToFloat64(ticket.QuoteVolume, 0, 64),
+				Price:        service_helper.MustConvertStringToFloat64(ticket.ClosePrice),
+				PriceLow:     service_helper.MustConvertStringToFloat64(ticket.LowPrice),
+				PriceHigh:    service_helper.MustConvertStringToFloat64(ticket.HighPrice),
+				PricePercent: service_helper.MustConvertStringToFloat64(ticket.PriceChangePercent),
+				Volume:       service_helper.MustConvertStringToFloat64(ticket.QuoteVolume),
 				Trades:       ticket.TradeCount,
 			}
 

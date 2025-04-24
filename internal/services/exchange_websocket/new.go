@@ -5,6 +5,7 @@ import (
 	services_interface_bot "backend/internal/services/bot/interface"
 	services_interface_exchange "backend/internal/services/exchange/interface"
 	services_interface_exchange_websocket "backend/internal/services/exchange_websocket/interface"
+	services_interface_order "backend/internal/services/order/interface"
 	services_interface_quote "backend/internal/services/quote/interface"
 	services_interface_quote_repository "backend/internal/services/quote_repository/interface"
 	services_interface_symbol "backend/internal/services/symbol/interface"
@@ -22,6 +23,7 @@ type exchangeWebsocketServiceImplementation struct {
 	quoteRepositoryService  func() services_interface_quote_repository.QuoteRepositoryService
 	exchangeService         func() services_interface_exchange.ExchangeService
 	userService             func() services_interface_user.UserService
+	orderService            func() services_interface_order.OrderService
 	botService              func() services_interface_bot.BotService
 	dumpService             func() services_interface_dump.DumpService
 	apiKey                  string
@@ -43,6 +45,7 @@ func NewExchangeWebsocketService(
 	quoteRepositoryService func() services_interface_quote_repository.QuoteRepositoryService,
 	exchangeService func() services_interface_exchange.ExchangeService,
 	userService func() services_interface_user.UserService,
+	orderService func() services_interface_order.OrderService,
 	botService func() services_interface_bot.BotService,
 	dumpService func() services_interface_dump.DumpService,
 ) services_interface_exchange_websocket.ExchangeWebSocketService {
@@ -53,6 +56,7 @@ func NewExchangeWebsocketService(
 		quoteRepositoryService:  quoteRepositoryService,
 		exchangeService:         exchangeService,
 		userService:             userService,
+		orderService:            orderService,
 		botService:              botService,
 		dumpService:             dumpService,
 		currentPriceStopChannel: nil,

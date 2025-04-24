@@ -21,8 +21,6 @@ func (object *botServiceImplementation) RunDealChannel() {
 
 		for _, botModel := range botsModels {
 			if botModel.Deal.StatusIsNull() {
-				log.Println("NULL")
-
 				priceInFactor := (100 - botModel.Multiplier.Value*botModel.CurrentParam.PercentIn) / 100
 				priceIn := object.getPriceIn(prevQuote, botModel.CurrentParam.Bind, priceInFactor, botModel.TickSizeFactor)
 
@@ -59,11 +57,10 @@ func (object *botServiceImplementation) RunDealChannel() {
 				// log.Println("in", botModel.Status)
 
 				if botModel.Deal.PreparationPriceIn != priceIn {
+					oldStatus := botModel.Deal.Status
 					botModel.Deal.PreparationPriceIn = priceIn
 					botModel.Deal.Status = enums_bot.DealStatusSendOpenLimit
 					amount := botModel.Deposit / botModel.Deal.PreparationPriceIn
-
-					log.Println("PreparationPriceIn", botModel.Deal.PreparationPriceIn, "amount", amount, "status", botModel.Deal.Status)
 
 					go func() {
 						object.websocketService().GetBroadcastChannel() <- &models_channel.BroadcastChannelModel{
@@ -71,12 +68,21 @@ func (object *botServiceImplementation) RunDealChannel() {
 							Data:  botModel,
 						}
 
-						if err := object.exchangeOrderService().AddOrder(botModel, botModel.Deal.PreparationPriceIn, amount); err != nil {
-							object.loggerService().Error().Printf("failed to add order: %v", err)
+						if oldStatus == enums_bot.DealStatusOpenLimit {
+							log.Println("UPDATE LIMIT", botModel.Symbol, botModel.Deal.PreparationPriceIn, amount)
+
+							if err := object.exchangeService().UpdateLimit(botModel, botModel.Deal.PreparationPriceIn, amount); err != nil {
+								object.loggerService().Error().Printf("failed to update limit: %v", err)
+							}
+						} else {
+							log.Println("NEW LIMIT", botModel.Symbol, botModel.Deal.PreparationPriceIn, amount)
+
+							if err := object.exchangeService().AddLimit(botModel, botModel.Deal.PreparationPriceIn, amount); err != nil {
+								object.loggerService().Error().Printf("failed to add limit: %v", err)
+							}
 						}
 					}()
 				}
-			} else if botModel.Deal.Status == enums_bot.DealStatusOpenLimit {
 			} else if botModel.Deal.Status == enums_bot.DealStatusOpen && object.checkCloseDeal(botModel, currentQuote.Price) {
 				botModelCopy := *botModel
 				object.GetAddDealChannel() <- &botModelCopy

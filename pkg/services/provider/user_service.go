@@ -8,9 +8,12 @@ import (
 func (object *ProviderService) UserService() services_interface_user.UserService {
 	if object.userService == nil {
 		object.userService = services_user.NewUserService(
+			object.LoggerService,
 			object.StorageService,
 			object.WebsocketService,
+			object.DumpService,
 			object.ExchangeService,
+			object.OrderService,
 		)
 	}
 
