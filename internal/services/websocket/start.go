@@ -19,7 +19,7 @@ func (object *websocketServiceImplementation) Start() {
 
 			go object.broadcastSymbols()
 			go object.broadcastExchangeLimits()
-			go object.userService().Load()
+			go object.userService().Broadcast()
 
 			object.broadcastChannel <- &models_channel.BroadcastChannelModel{
 				Event: enums.WebsocketEventBotList,

@@ -25,6 +25,7 @@ type BotModel struct {
 	AmountPrecision int                  `json:"amountPrecision"`
 	PricePrecision  int                  `json:"pricePrecision"`
 	Status          enums_bot.Status     `json:"status"`
+	Error           string               `json:"error"`
 	Deal            BotDealModel         `gorm:"embedded;embeddedPrefix:deal_" json:"deal"`
 }
 

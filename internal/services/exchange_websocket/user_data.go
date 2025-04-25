@@ -22,21 +22,18 @@ func (object *exchangeWebsocketServiceImplementation) userData() {
 			listenKey,
 			func(event *futures.WsUserDataEvent) {
 				if event.Event == futures.UserDataEventTypeAccountUpdate {
-					object.dumpService().Dump(event.AccountUpdate)
-
 					for _, balance := range event.AccountUpdate.Balances {
 						if balance.Asset == "USDT" {
 							object.userService().UpdateBalance(services_helper.MustConvertStringToFloat64(balance.Balance))
 						}
 					}
 				} else if event.Event == futures.UserDataEventTypeOrderTradeUpdate {
-					object.dumpService().Dump(event.OrderTradeUpdate)
-
 					object.orderService().GetOrderChannel() <- &models_order.OrderModel{
 						OrderID:          event.OrderTradeUpdate.ClientOrderID,
 						Symbol:           event.OrderTradeUpdate.Symbol,
 						SideType:         enums_exchange.SideType(event.OrderTradeUpdate.Side),
 						OrderType:        enums_exchange.OrderType(event.OrderTradeUpdate.Type),
+						PositionType:     enums_exchange.PositionType(event.OrderTradeUpdate.PositionSide),
 						ExecutionStatus:  enums_exchange.OrderExecutionStatus(event.OrderTradeUpdate.ExecutionType),
 						Status:           enums_exchange.OrderStatus(event.OrderTradeUpdate.Status),
 						OriginalPrice:    services_helper.MustConvertStringToFloat64(event.OrderTradeUpdate.OriginalPrice),

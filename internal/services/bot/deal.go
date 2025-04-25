@@ -6,6 +6,7 @@ import (
 	models_bot "backend/internal/models/bot"
 	models_channel "backend/internal/models/channel"
 	"log"
+	"time"
 )
 
 func (object *botServiceImplementation) RunDealChannel() {
@@ -24,39 +25,12 @@ func (object *botServiceImplementation) RunDealChannel() {
 				priceInFactor := (100 - botModel.Multiplier.Value*botModel.CurrentParam.PercentIn) / 100
 				priceIn := object.getPriceIn(prevQuote, botModel.CurrentParam.Bind, priceInFactor, botModel.TickSizeFactor)
 
-				// priceOutFactor := (100 + botModel.Multiplier.Value*botModel.CurrentParam.PercentOut) / 100
-				// priceStopFactor := 0.0
-
-				// if botModel.CurrentParam.StopPercent > 0 {
-				// 	priceStopFactor = (100 - botModel.Multiplier.Value*botModel.CurrentParam.StopPercent) / 100
-				// }
-
-				// botModel.Deal.TimeIn = time.Now().UnixMilli()
-				// botModel.Deal.PriceIn = currentQuote.Price
-				// botModel.Deal.AmountIn = botModel.Deposit / botModel.Deal.PriceIn
-				// botModel.Deal.CalculatePriceOut = object.getPriceOut(botModel.Deal.PriceIn, priceOutFactor, botModel.TickSizeFactor)
-				// botModel.Deal.CalculatePriceStop = object.getPriceStop(botModel.Deal.PriceIn, priceStopFactor, botModel.TickSizeFactor)
-
-				// if botModel.CurrentParam.StopTime > 0 {
-				// 	botModel.Deal.CalculateTimeOut = botModel.Deal.TimeIn + botModel.CurrentParam.StopTime*60*1000
-				// }
-
-				// botModel.Deal.Status = enums_bot.DealStatusSendOpenLimit
-
-				// go func() {
-				// 	if err := object.exchangeService().Limit(botModel); err != nil {
-				// 		object.loggerService().Error().Printf("limit error: %v", err)
-				// 	}
-				// }()
-
-				// object.websocketService().GetBroadcastChannel() <- &models_channel.BroadcastChannelModel{
-				// 	Event: enums.WebsocketEventBot,
-				// 	Data:  botModel,
-				// }
-
-				// log.Println("in", botModel.Status)
-
 				if botModel.Deal.PreparationPriceIn != priceIn {
+					if object.userService().GetAvailableBalance() < botModel.Deposit {
+						log.Println("not enough balance", botModel.Symbol, "deposit", botModel.Deposit)
+						continue
+					}
+
 					oldStatus := botModel.Deal.Status
 					botModel.Deal.PreparationPriceIn = priceIn
 					botModel.Deal.Status = enums_bot.DealStatusSendOpenLimit
@@ -69,88 +43,66 @@ func (object *botServiceImplementation) RunDealChannel() {
 						}
 
 						if oldStatus == enums_bot.DealStatusOpenLimit {
-							log.Println("UPDATE LIMIT", botModel.Symbol, botModel.Deal.PreparationPriceIn, amount)
-
 							if err := object.exchangeService().UpdateLimit(botModel, botModel.Deal.PreparationPriceIn, amount); err != nil {
 								object.loggerService().Error().Printf("failed to update limit: %v", err)
 							}
 						} else {
-							log.Println("NEW LIMIT", botModel.Symbol, botModel.Deal.PreparationPriceIn, amount)
+							if err := object.exchangeService().AddInLimit(botModel, botModel.Deal.PreparationPriceIn, amount); err != nil {
+								object.loggerService().Error().Printf("failed to add in limit: %v", err)
 
-							if err := object.exchangeService().AddLimit(botModel, botModel.Deal.PreparationPriceIn, amount); err != nil {
-								object.loggerService().Error().Printf("failed to add limit: %v", err)
+								object.botRepositoryService().Remove(botModel.Symbol, botModel.ID)
+
+								botModel.Status = enums_bot.StatusStop
+								botModel.Error = err.Error()
+
+								if err = object.Update(botModel); err != nil {
+									object.loggerService().Error().Printf("failed to update bot: %v", err)
+								}
 							}
 						}
 					}()
 				}
-			} else if botModel.Deal.Status == enums_bot.DealStatusOpen && object.checkCloseDeal(botModel, currentQuote.Price) {
-				botModelCopy := *botModel
-				object.GetAddDealChannel() <- &botModelCopy
+			} else if botModel.Deal.Status == enums_bot.DealStatusOpen && object.checkStop(botModel, currentQuote.Price) {
+				botModel.Deal.Status = enums_bot.DealStatusSendClose
 
-				botModel.Deal = models_bot.BotDealModel{}
+				go func() {
+					object.websocketService().GetBroadcastChannel() <- &models_channel.BroadcastChannelModel{
+						Event: enums.WebsocketEventBot,
+						Data:  botModel,
+					}
 
-				object.websocketService().GetBroadcastChannel() <- &models_channel.BroadcastChannelModel{
-					Event: enums.WebsocketEventBot,
-					Data:  &botModelCopy,
-				}
-
-				log.Println("out", botModel.Status)
+					if err := object.exchangeService().AddOutMarket(botModel, botModel.Deal.AmountOut); err != nil {
+						object.loggerService().Error().Printf("failed to add out market: %v", err)
+					}
+				}()
 			}
 		}
 	}
 }
 
-// func (object *botServiceImplementation) checkOpenDeal(botModel *models_bot.BotModel, currentQuote *models_quote.QuoteModel) bool {
-// 	if botModel.TradeDirection == enums.TradeDirectionLong {
-// 		return currentQuote.Price <= botModel.PreparationDeal.PriceIn
-// 	} else if botModel.TradeDirection == enums.TradeDirectionShort {
-// 		return currentQuote.Price >= botModel.PreparationDeal.PriceIn
-// 	}
-//
-// 	return false
-// }
+func (object *botServiceImplementation) checkStop(botModel *models_bot.BotModel, currentPrice float64) bool {
+	now := time.Now().UnixMilli()
 
-func (object *botServiceImplementation) checkCloseDeal(botModel *models_bot.BotModel, currentPrice float64) bool {
-	// now := time.Now().UnixMilli()
-	//
-	// switch botModel.TradeDirection {
-	// case enums.TradeDirectionLong:
-	// 	if currentPrice >= botModel.Deal.CalculatePriceOut {
-	// 		botModel.Deal.PriceOut = currentPrice
-	// 	} else if botModel.Deal.CalculatePriceStop > 0 && currentPrice <= botModel.Deal.CalculatePriceStop {
-	// 		botModel.Deal.PriceOut = currentPrice
-	// 		botModel.Deal.IsStopPercent = true
-	// 	} else if botModel.Deal.CalculateTimeOut > 0 && now >= botModel.Deal.CalculateTimeOut {
-	// 		botModel.Deal.PriceOut = currentPrice
-	// 		botModel.Deal.IsStopTime = true
-	// 	} else {
-	// 		return false
-	// 	}
-	// case enums.TradeDirectionShort:
-	// 	if currentPrice <= botModel.Deal.CalculatePriceOut {
-	// 		botModel.Deal.PriceOut = currentPrice
-	// 	} else if botModel.Deal.CalculatePriceStop > 0 && currentPrice >= botModel.Deal.CalculatePriceStop {
-	// 		botModel.Deal.PriceOut = currentPrice
-	// 		botModel.Deal.IsStopPercent = true
-	// 	} else if botModel.Deal.CalculateTimeOut > 0 && now >= botModel.Deal.CalculateTimeOut {
-	// 		botModel.Deal.PriceOut = currentPrice
-	// 		botModel.Deal.IsStopTime = true
-	// 	} else {
-	// 		return false
-	// 	}
-	// default:
-	// 	return false
-	// }
-	//
-	// botModel.Deal.TimeOut = now
-	// botModel.Deal.AmountOut = botModel.Deal.AmountIn * botModel.Deal.PriceOut
-	// botModel.Deal.Status = enums_bot.DealStatusClose
-	//
-	// if botModel.NextParam.PercentIn > 0 {
-	// 	botModel.PrevParam = botModel.CurrentParam
-	// 	botModel.CurrentParam = botModel.NextParam
-	// 	botModel.NextParam = models_bot.BotParamModel{}
-	// }
+	switch botModel.TradeDirection {
+	case enums.TradeDirectionLong:
+		if botModel.Deal.PreparationPriceStop > 0 && currentPrice <= botModel.Deal.PreparationPriceStop {
+			botModel.Deal.IsStopPercent = true
+		} else if botModel.Deal.PreparationTimeOut > 0 && now >= botModel.Deal.PreparationTimeOut {
+			botModel.Deal.IsStopTime = true
+		} else {
+			return false
+		}
+	case enums.TradeDirectionShort:
+		if botModel.Deal.PreparationPriceStop > 0 && currentPrice >= botModel.Deal.PreparationPriceStop {
+			botModel.Deal.IsStopPercent = true
+		} else if botModel.Deal.PreparationTimeOut > 0 && now >= botModel.Deal.PreparationTimeOut {
+			botModel.Deal.IsStopTime = true
+		} else {
+			return false
+		}
+	default:
+		return false
+	}
 
 	return true
 }

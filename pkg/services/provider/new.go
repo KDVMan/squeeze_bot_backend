@@ -12,7 +12,6 @@ import (
 	services_interface_chart_settings "backend/internal/services/chart_settings/interface"
 	services_interface_exchange "backend/internal/services/exchange/interface"
 	services_interface_exchange_limit "backend/internal/services/exchange_limit/interface"
-	services_interface_exchange_order "backend/internal/services/exchange_order/interface"
 	services_interface_exchange_websocket "backend/internal/services/exchange_websocket/interface"
 	services_interface_init "backend/internal/services/init/interface"
 	services_interface_order "backend/internal/services/order/interface"
@@ -61,7 +60,6 @@ type ProviderService struct {
 	exchangeService          services_interface_exchange.ExchangeService
 	exchangeLimitService     services_interface_exchange_limit.ExchangeLimitService
 	exchangeWebsocketService services_interface_exchange_websocket.ExchangeWebSocketService
-	exchangeOrderService     services_interface_exchange_order.ExchangeOrderService
 	quoteService             services_interface_quote.QuoteService
 	quoteRepositoryService   services_interface_quote_repository.QuoteRepositoryService
 	chartSettingsService     services_interface_chart_settings.ChartSettingsService
@@ -82,10 +80,6 @@ func NewProviderService(parentCtx context.Context) *ProviderService {
 
 func (object *ProviderService) Shutdown() {
 	object.loggerService.Info().Println("shutting down provider service...")
-
-	if object.exchangeOrderService != nil {
-		object.exchangeOrderService.Stop()
-	}
 
 	if object.exchangeWebsocketService != nil {
 		object.exchangeWebsocketService.Stop()

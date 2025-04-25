@@ -9,8 +9,10 @@ func (object *ProviderService) OrderService() services_interface_order.OrderServ
 	if object.orderService == nil {
 		object.orderService = services_order.NewOrderService(
 			object.LoggerService,
-			object.StorageService,
 			object.DumpService,
+			object.WebsocketService,
+			object.ExchangeService,
+			object.BotService,
 			object.BotRepositoryService,
 			object.UserService,
 		)

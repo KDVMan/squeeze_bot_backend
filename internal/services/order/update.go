@@ -9,16 +9,13 @@ func (object *orderServiceImplementation) Update(orderModel *models_order.OrderM
 	orderModel.UpdateAmount()
 
 	object.mutex.Lock()
-	defer object.mutex.Unlock()
+	defer func() {
+		object.dumpService().Dump(object.data)
+		object.mutex.Unlock()
+	}()
 
-	if orderModel.Status == enums_exchange.OrderStatusCanceled ||
-		orderModel.Status == enums_exchange.OrderStatusExpired ||
-		(orderModel.Status == enums_exchange.OrderStatusFilled && orderModel.SideType == enums_exchange.SideTypeSell) {
+	if object.isOrderClosed(orderModel) {
 		delete(object.data, orderModel.OrderID)
-
-		if err := object.storageService().DB().Where("order_id = ?", orderModel.OrderID).Delete(&models_order.OrderModel{}).Error; err != nil {
-			object.loggerService().Error().Printf("failed to delete order from DB: %v", err)
-		}
 
 		// что бы mutex не блочил т.к. там будет вызов GetAmount
 		go object.userService().UpdateAvailableBalance()
@@ -29,10 +26,6 @@ func (object *orderServiceImplementation) Update(orderModel *models_order.OrderM
 	existingOrderModel, exists := object.data[orderModel.OrderID]
 	if !exists {
 		object.data[orderModel.OrderID] = orderModel
-
-		if err := object.storageService().DB().Create(orderModel).Error; err != nil {
-			object.loggerService().Error().Printf("failed to create order in DB: %v", err)
-		}
 
 		// что бы mutex не блочил т.к. там будет вызов GetAmount
 		go object.userService().UpdateAvailableBalance()
@@ -51,10 +44,18 @@ func (object *orderServiceImplementation) Update(orderModel *models_order.OrderM
 	existingOrderModel.Commission = orderModel.Commission
 	existingOrderModel.Amount = orderModel.Amount
 
-	if err := object.storageService().DB().Save(existingOrderModel).Error; err != nil {
-		object.loggerService().Error().Printf("failed to update order in DB: %v", err)
-	}
-
 	// что бы mutex не блочил т.к. там будет вызов GetAmount
 	go object.userService().UpdateAvailableBalance()
+}
+
+func (object *orderServiceImplementation) isOrderClosed(orderModel *models_order.OrderModel) bool {
+	if orderModel.Status == enums_exchange.OrderStatusCanceled {
+		return true
+	} else if orderModel.Status == enums_exchange.OrderStatusExpired {
+		return true
+	} else if orderModel.ExecutionStatus == enums_exchange.OrderExecutionStatusTrade && orderModel.Status == enums_exchange.OrderStatusFilled {
+		return true
+	}
+
+	return false
 }

@@ -6,12 +6,11 @@ import (
 	models_channel "backend/internal/models/channel"
 	models_exchange_limit "backend/internal/models/exchange_limit"
 	"gorm.io/gorm"
-	"log"
 	"strings"
 )
 
 func (object *exchangeLimitServiceImplementation) Update(limits map[string]int) error {
-	log.Println("limits", limits)
+	// log.Println("limits", limits)
 
 	for key, used := range limits {
 		data := map[string]interface{}{

@@ -9,7 +9,7 @@ import (
 	"github.com/adshao/go-binance/v2/futures"
 )
 
-func (object *exchangeServiceImplementation) AddLimit(botModel *models_bot.BotModel, price float64, amount float64) error {
+func (object *exchangeServiceImplementation) AddInLimit(botModel *models_bot.BotModel, price float64, amount float64) error {
 	direction := futures.SideTypeBuy
 	positionSide := futures.PositionSideTypeLong
 
@@ -18,7 +18,7 @@ func (object *exchangeServiceImplementation) AddLimit(botModel *models_bot.BotMo
 		positionSide = futures.PositionSideTypeShort
 	}
 
-	orderID := object.getOrderID(botModel.ID)
+	botModel.OrderID = object.getOrderID(botModel.ID)
 
 	_, err := object.client.NewCreateOrderService().
 		Symbol(botModel.Symbol).
@@ -28,7 +28,7 @@ func (object *exchangeServiceImplementation) AddLimit(botModel *models_bot.BotMo
 		TimeInForce(futures.TimeInForceTypeGTC).
 		Quantity(fmt.Sprintf("%.*f", botModel.AmountPrecision, amount)).
 		Price(fmt.Sprintf("%.*f", botModel.PricePrecision, price)).
-		NewClientOrderID(orderID).
+		NewClientOrderID(botModel.OrderID).
 		Do(context.Background())
 	if err != nil {
 		return err

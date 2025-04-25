@@ -5,12 +5,12 @@ import "github.com/go-playground/validator/v10"
 type Status string
 
 const (
-	StatusNew     Status = "new" // добавлен через калькулятор
-	StatusAdd     Status = "add" // добавлен в ручную
-	StatusRun     Status = "run" // запущен (собраны свечи и подписан на монету)
-	StatusStop    Status = "stop"
-	StatusArchive Status = "archive"
-	StatusWait    Status = "wait" // защита, когда монеты льются
+	StatusNew    Status = "new" // добавлен через калькулятор
+	StatusAdd    Status = "add" // добавлен в ручную
+	StatusRun    Status = "run" // запущен (собраны свечи и подписан на монету)
+	StatusStop   Status = "stop"
+	StatusDelete Status = "delete"
+	StatusWait   Status = "wait" // защита, когда монеты льются
 )
 
 func (object Status) String() string {
@@ -27,7 +27,7 @@ func StatusValidate(field validator.FieldLevel) bool {
 
 func (object Status) StatusValid() bool {
 	switch object {
-	case StatusNew, StatusAdd, StatusRun, StatusStop, StatusArchive, StatusWait:
+	case StatusNew, StatusAdd, StatusRun, StatusStop, StatusDelete, StatusWait:
 		return true
 	default:
 		return false

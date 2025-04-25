@@ -6,9 +6,9 @@ import (
 	"net/http"
 )
 
-func (object *botRouteImplementation) status() http.HandlerFunc {
+func (object *botRouteImplementation) updateStatus() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var request models_bot.StatusRequestModel
+		var request models_bot.UpdateStatusRequestModel
 
 		if err := object.requestService().Decode(w, r, &request); err != nil {
 			return
@@ -18,7 +18,7 @@ func (object *botRouteImplementation) status() http.HandlerFunc {
 			return
 		}
 
-		if err := object.botService().Status(&request); err != nil {
+		if err := object.botService().UpdateStatus(&request); err != nil {
 			message := "failed to update bot status"
 			object.loggerService().Error().Printf("%s: %v", message, err)
 

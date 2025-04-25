@@ -6,5 +6,4 @@ type OrderService interface {
 	Update(*models_order.OrderModel)
 	RunOrderChannel()
 	GetOrderChannel() chan *models_order.OrderModel
-	GetAmount() float64
 }
