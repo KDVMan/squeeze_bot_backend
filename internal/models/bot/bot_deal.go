@@ -16,6 +16,9 @@ type BotDealModel struct {
 	PreparationPriceOut  float64              `json:"preparationPriceOut"`
 	PreparationPriceStop float64              `json:"preparationPriceStop"`
 	PreparationTimeOut   int64                `json:"preparationTimeOut"`
+	TriggerTime          int64                `json:"triggerTime"`
+	// LastLogTime          int64                `json:"-"`
+	// LastLoggedPercent    float64              `json:"-"`
 }
 
 func (object *BotDealModel) StatusIsNull() bool {

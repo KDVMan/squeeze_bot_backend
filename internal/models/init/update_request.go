@@ -7,9 +7,9 @@ import (
 )
 
 type UpdateRequestModel struct {
+	BotID            uint                     `json:"botID" validate:"gte=0"`
 	Symbol           string                   `json:"symbol" validate:"required,symbolFormat,uppercase"`
 	Intervals        []*models_quote.Interval `json:"intervals,omitempty"`
-	BotID            int                      `json:"botID" validate:"gte=0"`
 	BotSortColumn    enums_bot.SortColumn     `json:"botSortColumn" validate:"required,botSortColumn"`
 	BotSortDirection enums.SortDirection      `json:"botSortDirection" validate:"required,sortDirection"`
 }

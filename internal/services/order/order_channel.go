@@ -29,18 +29,17 @@ func (object *orderServiceImplementation) RunOrderChannel() {
 					orderModel.OrderType == enums_exchange.OrderTypeLimit &&
 					orderModel.ExecutionStatus == enums_exchange.OrderExecutionStatusNew &&
 					orderModel.Status == enums_exchange.OrderStatusNew {
-					botModel.Deal.Status = enums_bot.DealStatusOpenLimit
+					object.statusOpenLimit(orderModel, botModel)
 				} else if orderModel.SideType == enums_exchange.SideTypeBuy &&
 					orderModel.OrderType == enums_exchange.OrderTypeLimit &&
 					orderModel.ExecutionStatus == enums_exchange.OrderExecutionStatusAmendment &&
 					orderModel.Status == enums_exchange.OrderStatusNew {
-					botModel.Deal.Status = enums_bot.DealStatusOpenLimit
+					object.statusOpenLimit(orderModel, botModel)
 				} else if orderModel.SideType == enums_exchange.SideTypeBuy &&
 					orderModel.OrderType == enums_exchange.OrderTypeLimit &&
 					orderModel.ExecutionStatus == enums_exchange.OrderExecutionStatusCanceled &&
 					orderModel.Status == enums_exchange.OrderStatusCanceled {
-					botModel.OrderID = ""
-					botModel.Deal = models_bot.BotDealModel{}
+					object.cancelLimit(botModel)
 				} else if orderModel.SideType == enums_exchange.SideTypeBuy &&
 					orderModel.OrderType == enums_exchange.OrderTypeLimit &&
 					orderModel.ExecutionStatus == enums_exchange.OrderExecutionStatusTrade &&
@@ -62,18 +61,17 @@ func (object *orderServiceImplementation) RunOrderChannel() {
 					orderModel.OrderType == enums_exchange.OrderTypeLimit &&
 					orderModel.ExecutionStatus == enums_exchange.OrderExecutionStatusNew &&
 					orderModel.Status == enums_exchange.OrderStatusNew {
-					botModel.Deal.Status = enums_bot.DealStatusOpenLimit
+					object.statusOpenLimit(orderModel, botModel)
 				} else if orderModel.SideType == enums_exchange.SideTypeSell &&
 					orderModel.OrderType == enums_exchange.OrderTypeLimit &&
 					orderModel.ExecutionStatus == enums_exchange.OrderExecutionStatusAmendment &&
 					orderModel.Status == enums_exchange.OrderStatusNew {
-					botModel.Deal.Status = enums_bot.DealStatusOpenLimit
+					object.statusOpenLimit(orderModel, botModel)
 				} else if orderModel.SideType == enums_exchange.SideTypeSell &&
 					orderModel.OrderType == enums_exchange.OrderTypeLimit &&
 					orderModel.ExecutionStatus == enums_exchange.OrderExecutionStatusCanceled &&
 					orderModel.Status == enums_exchange.OrderStatusCanceled {
-					botModel.OrderID = ""
-					botModel.Deal = models_bot.BotDealModel{}
+					object.cancelLimit(botModel)
 				} else if orderModel.SideType == enums_exchange.SideTypeSell &&
 					orderModel.OrderType == enums_exchange.OrderTypeLimit &&
 					orderModel.ExecutionStatus == enums_exchange.OrderExecutionStatusTrade &&
@@ -90,10 +88,35 @@ func (object *orderServiceImplementation) RunOrderChannel() {
 					orderModel.Status == enums_exchange.OrderStatusFilled {
 					object.closeLimit(orderModel, botModel)
 				}
-
 			}
 		}
 	}
+}
+
+func (object *orderServiceImplementation) cancelLimit(botModel *models_bot.BotModel) {
+	botModel.OrderID = ""
+	botModel.Deal = models_bot.BotDealModel{}
+
+	go func() {
+		object.websocketService().GetBroadcastChannel() <- &models_channel.BroadcastChannelModel{
+			Event: enums.WebsocketEventBot,
+			Data:  botModel,
+		}
+	}()
+}
+
+func (object *orderServiceImplementation) statusOpenLimit(orderModel *models_order.OrderModel, botModel *models_bot.BotModel) {
+	botModel.Deal.PriceIn = orderModel.OriginalPrice
+	botModel.Deal.AmountIn = orderModel.OriginalQuantity * orderModel.OriginalPrice
+	botModel.Deal.AmountOut = orderModel.OriginalQuantity
+	botModel.Deal.Status = enums_bot.DealStatusOpenLimit
+
+	go func() {
+		object.websocketService().GetBroadcastChannel() <- &models_channel.BroadcastChannelModel{
+			Event: enums.WebsocketEventBot,
+			Data:  botModel,
+		}
+	}()
 }
 
 func (object *orderServiceImplementation) openLimit(orderModel *models_order.OrderModel, botModel *models_bot.BotModel) {
@@ -146,6 +169,8 @@ func (object *orderServiceImplementation) closeLimit(orderModel *models_order.Or
 		botModel.CurrentParam = botModel.NextParam
 		botModel.NextParam = models_bot.BotParamModel{}
 	}
+
+	go object.userService().UpdateAvailableBalance()
 
 	object.websocketService().GetBroadcastChannel() <- &models_channel.BroadcastChannelModel{
 		Event: enums.WebsocketEventBot,

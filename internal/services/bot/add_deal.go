@@ -3,6 +3,7 @@ package services_bot
 import (
 	"backend/internal/enums"
 	models_bot "backend/internal/models/bot"
+	models_channel "backend/internal/models/channel"
 	models_deal "backend/internal/models/deal"
 )
 
@@ -34,6 +35,11 @@ func (object *botServiceImplementation) RunAddDealChannel() {
 		if err := object.storageService().DB().Create(dealModel).Error; err != nil {
 			object.loggerService().Error().Printf("failed to save deal: %v", err)
 			continue
+		}
+
+		object.websocketService().GetBroadcastChannel() <- &models_channel.BroadcastChannelModel{
+			Event: enums.WebsocketEventDeal,
+			Data:  &dealModel,
 		}
 	}
 }

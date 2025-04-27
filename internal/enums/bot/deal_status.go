@@ -7,6 +7,7 @@ const (
 	DealStatusSendOpenLimit DealStatus = "send_open_limit"
 	DealStatusOpenLimit     DealStatus = "open_limit"
 	DealStatusOpen          DealStatus = "open"
+	DealStatusSendCancel    DealStatus = "send_cancel"
 	DealStatusSendClose     DealStatus = "send_close"
 	DealStatusClose         DealStatus = "close"
 )

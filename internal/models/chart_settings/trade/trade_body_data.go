@@ -27,7 +27,7 @@ func LoadDefaultTradeBodyData(tradeDirection enums.TradeDirection) TradeBodyData
 
 	return TradeBodyData{
 		Open:  models_chart_settings_figure.LoadDefaultFigureBody(true, enums_chart_settings.FigureTriangle, "#0cff00", 15, 20, 0, directionOpen),
-		Close: models_chart_settings_figure.LoadDefaultFigureBody(true, enums_chart_settings.FigureTriangle, "#ffc500", 15, 20, 0, directionClose),
-		Stop:  models_chart_settings_figure.LoadDefaultFigureBody(true, enums_chart_settings.FigureTriangle, "#ff0000", 15, 20, 0, directionClose),
+		Close: models_chart_settings_figure.LoadDefaultFigureBody(true, enums_chart_settings.FigureTriangle, "#ff0000", 15, 20, 0, directionClose),
+		Stop:  models_chart_settings_figure.LoadDefaultFigureBody(true, enums_chart_settings.FigureTriangle, "#0072ff", 15, 20, 0, directionClose),
 	}
 }

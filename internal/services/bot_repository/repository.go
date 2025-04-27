@@ -2,7 +2,6 @@ package services_bot_repository
 
 import (
 	models_bot "backend/internal/models/bot"
-	"log"
 )
 
 func (object *botRepositoryServiceImplementation) Add(botModel *models_bot.BotModel) {
@@ -26,8 +25,6 @@ func (object *botRepositoryServiceImplementation) GetByID(ID uint, remove bool) 
 						delete(object.data, symbol)
 					}
 				}
-
-				log.Println("total", len(object.data))
 
 				return botModel, true
 			}

@@ -6,6 +6,7 @@ import (
 )
 
 type QuoteRequestModel struct {
+	BotID       uint
 	Symbol      string
 	Interval    enums.Interval
 	QuotesLimit int

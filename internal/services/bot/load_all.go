@@ -29,5 +29,16 @@ func (object *botServiceImplementation) LoadAll() []*models_bot.BotModel {
 		return []*models_bot.BotModel{}
 	}
 
+	repoBots := object.botRepositoryService().GetAll()
+
+	for i, dbBot := range botsModels {
+		for _, repoBot := range repoBots {
+			if dbBot.ID == repoBot.ID {
+				botsModels[i] = repoBot
+				break
+			}
+		}
+	}
+
 	return botsModels
 }

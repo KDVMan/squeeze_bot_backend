@@ -9,16 +9,16 @@ func (object *orderServiceImplementation) Update(orderModel *models_order.OrderM
 	orderModel.UpdateAmount()
 
 	object.mutex.Lock()
+
 	defer func() {
-		object.dumpService().Dump(object.data)
+		// что бы mutex не блочил т.к. там будет вызов GetAmount
+		go object.userService().UpdateAvailableBalance()
+
 		object.mutex.Unlock()
 	}()
 
 	if object.isOrderClosed(orderModel) {
 		delete(object.data, orderModel.OrderID)
-
-		// что бы mutex не блочил т.к. там будет вызов GetAmount
-		go object.userService().UpdateAvailableBalance()
 
 		return
 	}
@@ -26,9 +26,6 @@ func (object *orderServiceImplementation) Update(orderModel *models_order.OrderM
 	existingOrderModel, exists := object.data[orderModel.OrderID]
 	if !exists {
 		object.data[orderModel.OrderID] = orderModel
-
-		// что бы mutex не блочил т.к. там будет вызов GetAmount
-		go object.userService().UpdateAvailableBalance()
 
 		return
 	}
@@ -43,9 +40,6 @@ func (object *orderServiceImplementation) Update(orderModel *models_order.OrderM
 	existingOrderModel.FilledQuantity = orderModel.FilledQuantity
 	existingOrderModel.Commission = orderModel.Commission
 	existingOrderModel.Amount = orderModel.Amount
-
-	// что бы mutex не блочил т.к. там будет вызов GetAmount
-	go object.userService().UpdateAvailableBalance()
 }
 
 func (object *orderServiceImplementation) isOrderClosed(orderModel *models_order.OrderModel) bool {

@@ -11,6 +11,7 @@ import (
 
 type InitModel struct {
 	ID               int                       `json:"-" gorm:"primaryKey"`
+	BotID            uint                      `json:"botID"`
 	Symbol           string                    `json:"symbol"`
 	Intervals        []*models_quote.Interval  `json:"intervals" gorm:"-"`
 	IntervalsJson    string                    `json:"-"`
@@ -18,7 +19,6 @@ type InitModel struct {
 	Precision        int                       `json:"precision"`
 	LeverageLevel    int                       `json:"leverageLevel"`
 	LeverageType     enums_symbol.LeverageType `json:"leverageType"`
-	BotID            int                       `json:"botID"`
 	BotSortColumn    enums_bot.SortColumn      `json:"botSortColumn"`
 	BotSortDirection enums.SortDirection       `json:"botSortDirection"`
 }

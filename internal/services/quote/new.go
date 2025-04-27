@@ -1,8 +1,10 @@
 package services_quote
 
 import (
+	services_interface_bot_repository "backend/internal/services/bot_repository/interface"
 	services_exchange_interface "backend/internal/services/exchange/interface"
 	services_exchange_websocket_interface "backend/internal/services/exchange_websocket/interface"
+	services_interface_init "backend/internal/services/init/interface"
 	services_quote_interface "backend/internal/services/quote/interface"
 	services_websocket_interface "backend/internal/services/websocket/interface"
 	services_interface_logger "backend/pkg/services/logger/interface"
@@ -15,6 +17,8 @@ type quoteServiceImplementation struct {
 	websocketService         func() services_websocket_interface.WebsocketService
 	exchangeService          func() services_exchange_interface.ExchangeService
 	exchangeWebsocketService func() services_exchange_websocket_interface.ExchangeWebSocketService
+	initService              func() services_interface_init.InitService
+	botRepositoryService     func() services_interface_bot_repository.BotRepositoryService
 }
 
 func NewQuoteService(
@@ -23,6 +27,8 @@ func NewQuoteService(
 	websocketService func() services_websocket_interface.WebsocketService,
 	exchangeService func() services_exchange_interface.ExchangeService,
 	exchangeWebsocketService func() services_exchange_websocket_interface.ExchangeWebSocketService,
+	initService func() services_interface_init.InitService,
+	botRepositoryService func() services_interface_bot_repository.BotRepositoryService,
 ) services_quote_interface.QuoteService {
 	return &quoteServiceImplementation{
 		loggerService:            loggerService,
@@ -30,5 +36,7 @@ func NewQuoteService(
 		websocketService:         websocketService,
 		exchangeService:          exchangeService,
 		exchangeWebsocketService: exchangeWebsocketService,
+		initService:              initService,
+		botRepositoryService:     botRepositoryService,
 	}
 }

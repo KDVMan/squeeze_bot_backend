@@ -11,4 +11,5 @@ type BotParamModel struct {
 	PercentOut   float64    `json:"percentOut"`
 	StopTime     int64      `json:"stopTime"`
 	StopPercent  float64    `json:"stopPercent"`
+	TriggerStart float64    `json:"triggerStart"`
 }

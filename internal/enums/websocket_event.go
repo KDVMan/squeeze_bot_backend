@@ -10,4 +10,5 @@ const (
 	WebsocketEventLeverage       WebsocketEvent = "leverage"
 	WebsocketEventBotList        WebsocketEvent = "botList"
 	WebsocketEventBot            WebsocketEvent = "bot"
+	WebsocketEventDeal           WebsocketEvent = "deal"
 )
