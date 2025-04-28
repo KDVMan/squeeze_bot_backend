@@ -72,31 +72,6 @@ func (object *botServiceImplementation) RunDealChannel() {
 							object.loggerService().Error().Printf("failed to update bot: %v", err)
 						}
 					}
-
-					// go func(botCopy *models_bot.BotModel) {
-					// 	defer balanceLock.Unlock()
-					//
-					// 	object.websocketService().GetBroadcastChannel() <- &models_channel.BroadcastChannelModel{
-					// 		Event: enums.WebsocketEventBot,
-					// 		Data:  botCopy,
-					// 	}
-					//
-					// 	availableBalance := object.userService().GetAvailableBalance()
-					// 	log.Println("AVAILABLE BALANCE BEFORE ORDER", availableBalance, "DEPOSIT", botCopy.Deposit)
-					//
-					// 	if err := object.exchangeService().AddInLimit(botCopy, botCopy.Deal.PreparationPriceIn, amount); err != nil {
-					// 		object.loggerService().Error().Printf("failed to add in limit: %v", err)
-					//
-					// 		object.botRepositoryService().Remove(botCopy.Symbol, botCopy.ID)
-					//
-					// 		botCopy.Status = enums_bot.StatusStop
-					// 		botCopy.Error = err.Error()
-					//
-					// 		if err = object.Update(botCopy); err != nil {
-					// 			object.loggerService().Error().Printf("failed to update bot: %v", err)
-					// 		}
-					// 	}
-					// }(botModel)
 				} else if percentToPriceIn > botModel.CurrentParam.TriggerStart && botModel.Deal.Status == enums_bot.DealStatusOpenLimit {
 					now := time.Now().UnixMilli()
 
