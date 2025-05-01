@@ -11,10 +11,14 @@ func (object *botRouteImplementation) add() http.HandlerFunc {
 		var request models_bot.AddRequestModel
 
 		if err := object.requestService().Decode(w, r, &request); err != nil {
+			render.Status(r, http.StatusBadRequest)
+			render.JSON(w, r, map[string]any{"success": false, "error": "invalid request"})
 			return
 		}
 
 		if err := object.requestService().Validate(w, r, &request); err != nil {
+			render.Status(r, http.StatusBadRequest)
+			render.JSON(w, r, map[string]any{"success": false, "error": "validation failed"})
 			return
 		}
 
@@ -23,11 +27,11 @@ func (object *botRouteImplementation) add() http.HandlerFunc {
 			object.loggerService().Error().Printf("%s: %v", message, err)
 
 			render.Status(r, http.StatusInternalServerError)
-			render.JSON(w, r, message)
+			render.JSON(w, r, map[string]any{"success": false, "error": message})
 
 			return
 		}
 
-		render.JSON(w, r, nil)
+		render.JSON(w, r, map[string]bool{"success": true})
 	}
 }

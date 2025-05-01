@@ -14,22 +14,72 @@ import (
 
 func (object *botServiceImplementation) Add(request *models_bot.AddRequestModel) error {
 	var botModel models_bot.BotModel
+	var hash string
 
-	hash := services_helper.MustConvertStringToMd5(
-		fmt.Sprintf("hash | symbol:%s | interval:%s | tradeDirection:%s | bind:%s | percentIn:%f | percentOut:%f | stopTime:%d | stopPercent:%f",
-			request.Symbol,
-			request.Interval.String(),
-			request.TradeDirection.String(),
-			request.Bind.String(),
-			request.PercentIn,
-			request.PercentOut,
-			request.StopTime,
-			request.StopPercent,
-		),
-	)
+	if request.IsCalculator {
+		hash = services_helper.MustConvertStringToMd5(
+			fmt.Sprintf("hash | symbol:%s | window:%d | interval:%s | tradeDirection:%s",
+				request.Symbol,
+				request.Window,
+				request.Interval.String(),
+				request.TradeDirection.String(),
+			),
+		)
+	} else {
+		hash = services_helper.MustConvertStringToMd5(
+			fmt.Sprintf("hash | symbol:%s | interval:%s | tradeDirection:%s | bind:%s | percentIn:%f | percentOut:%f | stopTime:%d | stopPercent:%f",
+				request.Symbol,
+				request.Interval.String(),
+				request.TradeDirection.String(),
+				request.Bind.String(),
+				request.PercentIn,
+				request.PercentOut,
+				request.StopTime,
+				request.StopPercent,
+			),
+		)
+	}
 
 	err := object.storageService().DB().Where("hash = ?", hash).First(&botModel).Error
 	if err == nil {
+		if request.IsCalculator {
+			botModel.Deposit = request.Deposit
+			botModel.IsReal = request.IsReal
+			botModel.Window = request.Window
+			botModel.LimitQuotes = request.LimitQuotes
+
+			botModel.CurrentParam = models_bot.BotParamModel{
+				Bind:         request.Bind,
+				PercentIn:    request.PercentIn,
+				PercentOut:   request.PercentOut,
+				StopTime:     request.StopTime,
+				StopPercent:  request.StopPercent,
+				TriggerStart: request.TriggerStart,
+			}
+
+			if err = object.storageService().DB().Save(&botModel).Error; err != nil {
+				return fmt.Errorf("failed to update calculator bot: %w", err)
+			}
+
+			if repositoryBotModel, ok := object.botRepositoryService().GetByID(botModel.ID, false); ok {
+				if repositoryBotModel.Deal.Status == enums_bot.DealStatusOpen {
+					repositoryBotModel.NextParam = botModel.CurrentParam
+				} else {
+					repositoryBotModel.CurrentParam = botModel.CurrentParam
+				}
+
+				object.websocketService().GetBroadcastChannel() <- &models_channel.BroadcastChannelModel{
+					Event: enums.WebsocketEventBot,
+					Data:  repositoryBotModel,
+				}
+			} else {
+				object.websocketService().GetBroadcastChannel() <- &models_channel.BroadcastChannelModel{
+					Event: enums.WebsocketEventBot,
+					Data:  botModel,
+				}
+			}
+		}
+
 		return nil
 	} else if !errors.Is(err, gorm.ErrRecordNotFound) {
 		return err
@@ -48,6 +98,12 @@ func (object *botServiceImplementation) Add(request *models_bot.AddRequestModel)
 		tickSizeFactor++
 	}
 
+	status := enums_bot.StatusAdd
+
+	if request.IsCalculator {
+		status = enums_bot.StatusRun
+	}
+
 	botModel = models_bot.BotModel{
 		Hash:           hash,
 		Deposit:        request.Deposit,
@@ -55,6 +111,7 @@ func (object *botServiceImplementation) Add(request *models_bot.AddRequestModel)
 		Symbol:         symbolModel.Symbol,
 		Interval:       request.Interval,
 		TradeDirection: request.TradeDirection,
+		Window:         request.Window,
 		LimitQuotes:    request.LimitQuotes,
 		PrevParam:      models_bot.BotParamModel{},
 		CurrentParam: models_bot.BotParamModel{
@@ -70,7 +127,8 @@ func (object *botServiceImplementation) Add(request *models_bot.AddRequestModel)
 		TickSizeFactor:  tickSizeFactor,
 		AmountPrecision: symbolModel.Limit.LeftPrecision,
 		PricePrecision:  symbolModel.Limit.PricePrecision,
-		Status:          enums_bot.StatusAdd,
+		Status:          status,
+		IsCalculator:    request.IsCalculator,
 	}
 
 	if err = object.storageService().DB().Create(&botModel).Error; err != nil {
@@ -82,7 +140,7 @@ func (object *botServiceImplementation) Add(request *models_bot.AddRequestModel)
 		Data:  object.LoadAll(),
 	}
 
-	object.GetRunChannel() <- object.LoadByHash(hash)
+	object.GetRunChannel() <- &botModel
 
 	return nil
 }

@@ -15,7 +15,7 @@ type BotModel struct {
 	Symbol          string               `json:"symbol"`
 	Interval        enums.Interval       `json:"interval"`
 	TradeDirection  enums.TradeDirection `json:"tradeDirection"`
-	Window          int                  `gorm:"default:0" json:"window"`
+	Window          int64                `gorm:"default:0" json:"window"`
 	LimitQuotes     int64                `json:"limitQuotes"`
 	PrevParam       BotParamModel        `gorm:"embedded;embeddedPrefix:prev_param_" json:"prevParam"`
 	CurrentParam    BotParamModel        `gorm:"embedded;embeddedPrefix:current_param_" json:"currentParam"`
@@ -27,6 +27,7 @@ type BotModel struct {
 	Status          enums_bot.Status     `json:"status"`
 	Error           string               `json:"error"`
 	Deal            BotDealModel         `gorm:"embedded;embeddedPrefix:deal_" json:"deal"`
+	IsCalculator    bool                 `json:"isCalculator"`
 }
 
 func (BotModel) TableName() string {
