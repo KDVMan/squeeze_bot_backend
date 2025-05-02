@@ -23,8 +23,15 @@ func (object *botServiceImplementation) RunDealChannel() {
 		for _, botModel := range botsModels {
 			if botModel.Deal.StatusIsNull() {
 				var percentToPriceIn float64
+
+				object.UpdateParam(botModel)
+
 				priceInFactor := (100 - botModel.Multiplier.Value*botModel.CurrentParam.PercentIn) / 100
 				priceIn := object.getPriceIn(prevQuote, botModel.CurrentParam.Bind, priceInFactor, botModel.TickSizeFactor)
+
+				if priceIn <= 0 {
+					continue
+				}
 
 				if botModel.TradeDirection == enums.TradeDirectionLong {
 					percentToPriceIn = ((currentQuote.Price - priceIn) / priceIn) * 100
@@ -32,28 +39,21 @@ func (object *botServiceImplementation) RunDealChannel() {
 					percentToPriceIn = ((priceIn - currentQuote.Price) / priceIn) * 100
 				}
 
-				// now := time.Now().UnixMilli()
-				// logInterval := int64(1000) // 1 секунда
-				// delta := 0.1               // шаг процента
-
-				// if math.Abs(botModel.Deal.LastLoggedPercent-percentToPriceIn) >= delta || (now-botModel.Deal.LastLogTime) >= logInterval {
-				// 	log.Println("percentToPriceIn", percentToPriceIn, "priceIn", priceIn, "trigger", botModel.CurrentParam.TriggerStart, "status", botModel.Deal.Status)
-				// 	botModel.Deal.LastLoggedPercent = percentToPriceIn
-				// 	botModel.Deal.LastLogTime = now
-				// }
-
 				if percentToPriceIn <= botModel.CurrentParam.TriggerStart && botModel.Deal.Status != enums_bot.DealStatusOpenLimit {
-					if object.userService().GetAvailableBalance() < botModel.Deposit {
+					if !object.balanceService().Reserve(botModel.ID, botModel.Deposit) {
 						// log.Println("not enough balance", botModel.ID, botModel.Symbol, "deposit", botModel.Deposit)
 						continue
 					}
-
-					log.Println("SEND!!!", object.userService().GetAvailableBalance(), botModel.ID)
 
 					botModel.Deal.PreparationPriceIn = priceIn
 					botModel.Deal.Status = enums_bot.DealStatusSendOpenLimit
 					botModel.Deal.TriggerTime = time.Now().UnixMilli()
 					amount := botModel.Deposit / botModel.Deal.PreparationPriceIn
+
+					if amount <= 0 || botModel.Deposit <= 0 || botModel.Deal.PreparationPriceIn <= 0 {
+						log.Printf("invalid amount: deposit=%.4f, price=%.8f -> amount=%.8f", botModel.Deposit, botModel.Deal.PreparationPriceIn, amount)
+						continue
+					}
 
 					object.websocketService().GetBroadcastChannel() <- &models_channel.BroadcastChannelModel{
 						Event: enums.WebsocketEventBot,
@@ -63,6 +63,7 @@ func (object *botServiceImplementation) RunDealChannel() {
 					if err := object.exchangeService().AddInLimit(botModel, botModel.Deal.PreparationPriceIn, amount); err != nil {
 						object.loggerService().Error().Printf("failed to add in limit: %v", err)
 
+						object.balanceService().Release(botModel.ID)
 						object.botRepositoryService().Remove(botModel.Symbol, botModel.ID)
 
 						botModel.Status = enums_bot.StatusStop
@@ -91,6 +92,7 @@ func (object *botServiceImplementation) RunDealChannel() {
 						if err := object.exchangeService().CancelLimit(botModel); err != nil {
 							object.loggerService().Error().Printf("failed to cancel limit : %v", err)
 
+							object.balanceService().Release(botModel.ID)
 							object.botRepositoryService().Remove(botModel.Symbol, botModel.ID)
 
 							botModel.Status = enums_bot.StatusStop
@@ -145,6 +147,23 @@ func (object *botServiceImplementation) checkStop(botModel *models_bot.BotModel,
 	}
 
 	return true
+}
+
+func (object *botServiceImplementation) UpdateParam(botModel *models_bot.BotModel) {
+	if botModel.Deal.Status != "" && botModel.Deal.Status != enums_bot.DealStatusNull {
+		return
+	}
+
+	if botModel.NextParam.PercentIn > 0 || botModel.NextParam.MustUpdate {
+		botModel.PrevParam = botModel.CurrentParam
+		botModel.CurrentParam = botModel.NextParam
+		botModel.NextParam = models_bot.BotParamModel{}
+
+		object.websocketService().GetBroadcastChannel() <- &models_channel.BroadcastChannelModel{
+			Event: enums.WebsocketEventBot,
+			Data:  botModel,
+		}
+	}
 }
 
 func (object *botServiceImplementation) GetDealChannel() chan string {

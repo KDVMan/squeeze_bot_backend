@@ -6,6 +6,7 @@ import (
 
 type BotService interface {
 	Add(*models_bot.AddRequestModel) error
+	AddCalculator(*models_bot.AddCalculatorRequestModel) error
 	LoadAll() []*models_bot.BotModel
 	LoadByID(uint) *models_bot.BotModel
 	LoadByHash(string) *models_bot.BotModel
@@ -18,4 +19,5 @@ type BotService interface {
 	GetAddDealChannel() chan *models_bot.BotModel
 	GetAmount() float64
 	Update(*models_bot.BotModel) error
+	UpdateParam(*models_bot.BotModel)
 }

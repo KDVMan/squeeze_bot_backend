@@ -36,6 +36,7 @@ func run(providerService *services_provider.ProviderService, parentCtx context.C
 	providerService.LoggerService().Info().Printf("starting server: %s", providerService.ConfigService().GetConfig().HttpServer.Address)
 
 	providerService.UserService().Init()
+	providerService.BalanceService().InitBalance(providerService.UserService().GetBalance())
 
 	go providerService.BotService().RunAddDealChannel()
 	go providerService.OrderService().RunOrderChannel()

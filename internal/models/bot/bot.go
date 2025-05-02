@@ -28,6 +28,7 @@ type BotModel struct {
 	Error           string               `json:"error"`
 	Deal            BotDealModel         `gorm:"embedded;embeddedPrefix:deal_" json:"deal"`
 	IsCalculator    bool                 `json:"isCalculator"`
+	TimeUpdate      int64                `json:"timeUpdate"`
 }
 
 func (BotModel) TableName() string {

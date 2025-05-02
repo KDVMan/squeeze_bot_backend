@@ -2,6 +2,7 @@ package services_bot
 
 import (
 	models_bot "backend/internal/models/bot"
+	services_interface_balance "backend/internal/services/balance/interface"
 	services_interface_bot "backend/internal/services/bot/interface"
 	services_interface_bot_repository "backend/internal/services/bot_repository/interface"
 	services_interface_exchange "backend/internal/services/exchange/interface"
@@ -31,11 +32,12 @@ type botServiceImplementation struct {
 	quoteService             func() services_interface_quote.QuoteService
 	quoteRepositoryService   func() services_interface_quote_repository.QuoteRepositoryService
 	botRepositoryService     func() services_interface_bot_repository.BotRepositoryService
-	userService              func() services_interface_user.UserService
-	runChannel               chan *models_bot.BotModel
-	dealChannel              chan string
-	addDealChannel           chan *models_bot.BotModel
-	commission               float64
+	// userService              func() services_interface_user.UserService
+	balanceService func() services_interface_balance.BalanceService
+	runChannel     chan *models_bot.BotModel
+	dealChannel    chan string
+	addDealChannel chan *models_bot.BotModel
+	commission     float64
 }
 
 func NewBotService(
@@ -52,6 +54,7 @@ func NewBotService(
 	quoteRepositoryService func() services_interface_quote_repository.QuoteRepositoryService,
 	botRepositoryService func() services_interface_bot_repository.BotRepositoryService,
 	userService func() services_interface_user.UserService,
+	balanceService func() services_interface_balance.BalanceService,
 ) services_interface_bot.BotService {
 	return &botServiceImplementation{
 		loggerService:            loggerService,
@@ -66,10 +69,11 @@ func NewBotService(
 		quoteService:             quoteService,
 		quoteRepositoryService:   quoteRepositoryService,
 		botRepositoryService:     botRepositoryService,
-		userService:              userService,
-		runChannel:               make(chan *models_bot.BotModel, 1000000),
-		dealChannel:              make(chan string, 1000000),
-		addDealChannel:           make(chan *models_bot.BotModel, 1000000),
-		commission:               configService().GetConfig().Binance.FuturesCommission,
+		// userService:              userService,
+		balanceService: balanceService,
+		runChannel:     make(chan *models_bot.BotModel, 1000000),
+		dealChannel:    make(chan string, 1000000),
+		addDealChannel: make(chan *models_bot.BotModel, 1000000),
+		commission:     configService().GetConfig().Binance.FuturesCommission,
 	}
 }

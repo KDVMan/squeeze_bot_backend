@@ -97,6 +97,8 @@ func (object *orderServiceImplementation) cancelLimit(botModel *models_bot.BotMo
 	botModel.OrderID = ""
 	botModel.Deal = models_bot.BotDealModel{}
 
+	object.balanceService().Release(botModel.ID)
+
 	go func() {
 		object.websocketService().GetBroadcastChannel() <- &models_channel.BroadcastChannelModel{
 			Event: enums.WebsocketEventBot,
@@ -135,7 +137,7 @@ func (object *orderServiceImplementation) openLimit(orderModel *models_order.Ord
 	botModel.Deal.PreparationPriceStop = object.getPriceStop(botModel.Deal.PriceIn, priceStopFactor, botModel.TickSizeFactor)
 
 	if botModel.CurrentParam.StopTime > 0 {
-		botModel.Deal.PreparationTimeOut = botModel.Deal.TimeIn + botModel.CurrentParam.StopTime*60*1000
+		botModel.Deal.PreparationTimeOut = botModel.Deal.TimeIn + botModel.CurrentParam.StopTime
 	}
 
 	botModel.OrderID = ""
@@ -158,19 +160,40 @@ func (object *orderServiceImplementation) closeLimit(orderModel *models_order.Or
 	botModel.Deal.PriceOut = orderModel.AveragePrice
 	botModel.Deal.AmountOut = orderModel.FilledQuantity * orderModel.AveragePrice
 
+	var delta float64
+
+	if botModel.TradeDirection == enums.TradeDirectionLong {
+		delta = botModel.Deal.AmountOut - botModel.Deal.AmountIn
+	} else if botModel.TradeDirection == enums.TradeDirectionShort {
+		delta = botModel.Deal.AmountIn - botModel.Deal.AmountOut
+	}
+
+	botModel.Deposit += delta
+
+	if botModel.Deposit < 10 {
+		botModel.Status = enums_bot.StatusStop
+		botModel.Error = "not enough deposit"
+
+		object.botRepositoryService().Remove(botModel.Symbol, botModel.ID)
+
+		if err := object.botService().Update(botModel); err != nil {
+			object.loggerService().Error().Printf("failed to update bot: %v", err)
+		}
+	}
+
+	object.balanceService().Release(botModel.ID)
+
 	botModelCopy := *botModel
 	object.botService().GetAddDealChannel() <- &botModelCopy
 
 	botModel.OrderID = ""
 	botModel.Deal = models_bot.BotDealModel{}
 
-	if botModel.NextParam.PercentIn > 0 {
-		botModel.PrevParam = botModel.CurrentParam
-		botModel.CurrentParam = botModel.NextParam
-		botModel.NextParam = models_bot.BotParamModel{}
-	}
-
-	go object.userService().UpdateAvailableBalance()
+	// if botModel.NextParam.PercentIn > 0 {
+	// 	botModel.PrevParam = botModel.CurrentParam
+	// 	botModel.CurrentParam = botModel.NextParam
+	// 	botModel.NextParam = models_bot.BotParamModel{}
+	// }
 
 	object.websocketService().GetBroadcastChannel() <- &models_channel.BroadcastChannelModel{
 		Event: enums.WebsocketEventBot,

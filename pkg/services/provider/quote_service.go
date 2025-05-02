@@ -11,6 +11,7 @@ func (object *ProviderService) QuoteService() services_quote_interface.QuoteServ
 			object.LoggerService,
 			object.StorageService,
 			object.WebsocketService,
+			object.DumpService,
 			object.ExchangeService,
 			object.ExchangeWebsocketService,
 			object.InitService,

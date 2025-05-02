@@ -8,6 +8,11 @@ import (
 
 func (object *botServiceImplementation) getPriceIn(quote *models_quote.QuoteModel, bind enums.Bind, priceFactor float64, tickSizeFactor int) float64 {
 	priceBind := object.getPriceBind(bind, quote)
+
+	if priceBind <= 0 {
+		return 0
+	}
+
 	priceIn := priceBind * priceFactor
 
 	return services_helper.Floor(priceIn, tickSizeFactor)

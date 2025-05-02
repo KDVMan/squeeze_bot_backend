@@ -12,4 +12,5 @@ type BotParamModel struct {
 	StopTime     int64      `json:"stopTime"`
 	StopPercent  float64    `json:"stopPercent"`
 	TriggerStart float64    `json:"triggerStart"`
+	MustUpdate   bool       `json:"mustUpdate"`
 }

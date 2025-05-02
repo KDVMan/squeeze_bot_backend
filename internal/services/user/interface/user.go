@@ -6,4 +6,5 @@ type UserService interface {
 	UpdateAvailableBalance()
 	Broadcast()
 	GetAvailableBalance() float64
+	GetBalance() float64
 }

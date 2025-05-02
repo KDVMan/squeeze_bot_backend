@@ -2,6 +2,7 @@ package services_order
 
 import (
 	models_order "backend/internal/models/order"
+	services_interface_balance "backend/internal/services/balance/interface"
 	services_interface_bot "backend/internal/services/bot/interface"
 	services_interface_bot_repository "backend/internal/services/bot_repository/interface"
 	services_interface_exchange "backend/internal/services/exchange/interface"
@@ -20,10 +21,11 @@ type orderServiceImplementation struct {
 	exchangeService      func() services_interface_exchange.ExchangeService
 	botService           func() services_interface_bot.BotService
 	botRepositoryService func() services_interface_bot_repository.BotRepositoryService
-	userService          func() services_interface_user.UserService
-	data                 map[string]*models_order.OrderModel
-	mutex                *sync.Mutex
-	orderChannel         chan *models_order.OrderModel
+	// userService          func() services_interface_user.UserService
+	balanceService func() services_interface_balance.BalanceService
+	data           map[string]*models_order.OrderModel
+	mutex          *sync.Mutex
+	orderChannel   chan *models_order.OrderModel
 }
 
 func NewOrderService(
@@ -34,6 +36,7 @@ func NewOrderService(
 	botService func() services_interface_bot.BotService,
 	botRepositoryService func() services_interface_bot_repository.BotRepositoryService,
 	userService func() services_interface_user.UserService,
+	balanceService func() services_interface_balance.BalanceService,
 ) services_interface_order.OrderService {
 	return &orderServiceImplementation{
 		loggerService:        loggerService,
@@ -42,9 +45,10 @@ func NewOrderService(
 		exchangeService:      exchangeService,
 		botService:           botService,
 		botRepositoryService: botRepositoryService,
-		userService:          userService,
-		data:                 make(map[string]*models_order.OrderModel),
-		mutex:                &sync.Mutex{},
-		orderChannel:         make(chan *models_order.OrderModel, 1000000),
+		// userService:          userService,
+		balanceService: balanceService,
+		data:           make(map[string]*models_order.OrderModel),
+		mutex:          &sync.Mutex{},
+		orderChannel:   make(chan *models_order.OrderModel, 1000000),
 	}
 }

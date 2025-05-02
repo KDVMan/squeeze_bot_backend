@@ -16,5 +16,4 @@ type AddRequestModel struct {
 	StopPercent    float64              `json:"stopPercent" validate:"gte=0"`
 	TriggerStart   float64              `json:"triggerStart" validate:"gte=0,ltefield=PercentIn"`
 	LimitQuotes    int64                `json:"limitQuotes" validate:"required,gt=0"`
-	IsCalculator   bool                 `json:"isCalculator"`
 }

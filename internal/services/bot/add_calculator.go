@@ -13,26 +13,61 @@ import (
 	"time"
 )
 
-func (object *botServiceImplementation) Add(request *models_bot.AddRequestModel) error {
+func (object *botServiceImplementation) AddCalculator(request *models_bot.AddCalculatorRequestModel) error {
 	var botModel models_bot.BotModel
 
-	request.StopTime *= 60 * 1000
-
 	hash := services_helper.MustConvertStringToMd5(
-		fmt.Sprintf("hash | symbol:%s | interval:%s | tradeDirection:%s | bind:%s | percentIn:%f | percentOut:%f | stopTime:%d | stopPercent:%f",
+		fmt.Sprintf("hash | symbol:%s | window:%d | interval:%s | tradeDirection:%s",
 			request.Symbol,
+			request.Window,
 			request.Interval.String(),
 			request.TradeDirection.String(),
-			request.Bind.String(),
-			request.PercentIn,
-			request.PercentOut,
-			request.StopTime,
-			request.StopPercent,
 		),
 	)
 
 	err := object.storageService().DB().Where("hash = ?", hash).First(&botModel).Error
 	if err == nil {
+		botModel.Deposit = request.Deposit
+		botModel.IsReal = true
+		botModel.Window = request.Window
+		botModel.LimitQuotes = request.LimitQuotes
+		botModel.TimeUpdate = time.Now().UnixMilli()
+
+		if request.PercentIn > 0 {
+			botModel.CurrentParam = models_bot.BotParamModel{
+				Bind:         request.Bind,
+				PercentIn:    request.PercentIn,
+				PercentOut:   request.PercentOut,
+				StopTime:     request.StopTime,
+				StopPercent:  request.StopPercent,
+				TriggerStart: request.TriggerStart,
+				MustUpdate:   true,
+			}
+		} else {
+			botModel.CurrentParam = models_bot.BotParamModel{
+				MustUpdate: true,
+			}
+		}
+
+		if err = object.storageService().DB().Save(&botModel).Error; err != nil {
+			return fmt.Errorf("failed to update calculator bot: %w", err)
+		}
+
+		if repositoryBotModel, ok := object.botRepositoryService().GetByID(botModel.ID, false); ok {
+			repositoryBotModel.TimeUpdate = time.Now().UnixMilli()
+			repositoryBotModel.NextParam = botModel.CurrentParam
+
+			object.websocketService().GetBroadcastChannel() <- &models_channel.BroadcastChannelModel{
+				Event: enums.WebsocketEventBot,
+				Data:  repositoryBotModel,
+			}
+		} else {
+			object.websocketService().GetBroadcastChannel() <- &models_channel.BroadcastChannelModel{
+				Event: enums.WebsocketEventBot,
+				Data:  botModel,
+			}
+		}
+
 		return nil
 	} else if !errors.Is(err, gorm.ErrRecordNotFound) {
 		return err
@@ -51,10 +86,12 @@ func (object *botServiceImplementation) Add(request *models_bot.AddRequestModel)
 		tickSizeFactor++
 	}
 
+	status := enums_bot.StatusAdd
+
 	botModel = models_bot.BotModel{
 		Hash:           hash,
 		Deposit:        request.Deposit,
-		IsReal:         request.IsReal,
+		IsReal:         true,
 		Symbol:         symbolModel.Symbol,
 		Interval:       request.Interval,
 		TradeDirection: request.TradeDirection,
@@ -74,8 +111,8 @@ func (object *botServiceImplementation) Add(request *models_bot.AddRequestModel)
 		TickSizeFactor:  tickSizeFactor,
 		AmountPrecision: symbolModel.Limit.LeftPrecision,
 		PricePrecision:  symbolModel.Limit.PricePrecision,
-		Status:          enums_bot.StatusAdd,
-		IsCalculator:    false,
+		Status:          status,
+		IsCalculator:    true,
 		TimeUpdate:      time.Now().UnixMilli(),
 	}
 
@@ -88,7 +125,9 @@ func (object *botServiceImplementation) Add(request *models_bot.AddRequestModel)
 		Data:  object.LoadAll(),
 	}
 
-	object.GetRunChannel() <- &botModel
+	if status == enums_bot.StatusAdd {
+		object.GetRunChannel() <- &botModel
+	}
 
 	return nil
 }

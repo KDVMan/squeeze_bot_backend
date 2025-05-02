@@ -15,6 +15,7 @@ func (object *ProviderService) OrderService() services_interface_order.OrderServ
 			object.BotService,
 			object.BotRepositoryService,
 			object.UserService,
+			object.BalanceService,
 		)
 	}
 

@@ -12,7 +12,7 @@ func (object *orderServiceImplementation) Update(orderModel *models_order.OrderM
 
 	defer func() {
 		// что бы mutex не блочил т.к. там будет вызов GetAmount
-		go object.userService().UpdateAvailableBalance()
+		// go object.userService().UpdateAvailableBalance()
 
 		object.mutex.Unlock()
 	}()

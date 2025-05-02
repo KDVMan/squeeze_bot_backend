@@ -7,6 +7,7 @@ import (
 	routes_interface_quote "backend/internal/routes/quote/interface"
 	routes_interface_symbol "backend/internal/routes/symbol/interface"
 	routes_interface_symbol_list "backend/internal/routes/symbol_list/interface"
+	services_interface_balance "backend/internal/services/balance/interface"
 	services_interface_bot "backend/internal/services/bot/interface"
 	services_interface_bot_repository "backend/internal/services/bot_repository/interface"
 	services_interface_chart_settings "backend/internal/services/chart_settings/interface"
@@ -67,6 +68,7 @@ type ProviderService struct {
 	botService               services_interface_bot.BotService
 	botRepositoryService     services_interface_bot_repository.BotRepositoryService
 	orderService             services_interface_order.OrderService
+	balanceService           services_interface_balance.BalanceService
 }
 
 func NewProviderService(parentCtx context.Context) *ProviderService {
