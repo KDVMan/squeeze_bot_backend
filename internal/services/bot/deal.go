@@ -52,6 +52,7 @@ func (object *botServiceImplementation) RunDealChannel() {
 
 					if amount <= 0 || botModel.Deposit <= 0 || botModel.Deal.PreparationPriceIn <= 0 {
 						log.Printf("invalid amount: deposit=%.4f, price=%.8f -> amount=%.8f", botModel.Deposit, botModel.Deal.PreparationPriceIn, amount)
+						object.balanceService().Release(botModel.ID)
 						continue
 					}
 

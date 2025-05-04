@@ -2,8 +2,10 @@ package services_quote
 
 import (
 	"backend/internal/enums"
+	enums_exchange_limit "backend/internal/enums/exchange_limit"
 	models_quote "backend/internal/models/quote"
 	"sort"
+	"time"
 )
 
 func (object *quoteServiceImplementation) LoadRange(symbol string, quoteRange *models_quote.QuoteRangeModel) ([]*models_quote.QuoteModel, error) {
@@ -21,6 +23,26 @@ func (object *quoteServiceImplementation) LoadRange(symbol string, quoteRange *m
 		// if variables_calculator.Stop {
 		// 	return nil, nil
 		// }
+
+		exchangeLimitModel, err := object.exchangeLimitService().Load()
+		if err != nil {
+			return nil, err
+		}
+
+		shouldWait := false
+
+		for _, limit := range exchangeLimitModel {
+			if limit.Type == enums_exchange_limit.RateTypeWeight && limit.TotalLeft <= 1000 {
+				shouldWait = true
+				break
+			}
+		}
+
+		if shouldWait {
+			now := time.Now()
+			wait := 60 - now.Second()
+			time.Sleep(time.Duration(wait+1) * time.Second)
+		}
 
 		result, err := object.LoadForBot(request)
 		if err != nil {
