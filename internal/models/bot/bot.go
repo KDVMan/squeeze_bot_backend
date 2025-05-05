@@ -29,6 +29,7 @@ type BotModel struct {
 	Deal            BotDealModel         `gorm:"embedded;embeddedPrefix:deal_" json:"deal"`
 	IsCalculator    bool                 `json:"isCalculator"`
 	TimeUpdate      int64                `json:"timeUpdate"`
+	Busy            bool                 `json:"busy"`
 }
 
 func (BotModel) TableName() string {

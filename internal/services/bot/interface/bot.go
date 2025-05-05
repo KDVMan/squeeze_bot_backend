@@ -20,4 +20,5 @@ type BotService interface {
 	GetAmount() float64
 	Update(*models_bot.BotModel) error
 	UpdateParam(*models_bot.BotModel)
+	GetBotEventChannel() chan *models_bot.BotEventModel
 }

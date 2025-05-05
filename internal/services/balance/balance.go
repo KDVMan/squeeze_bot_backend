@@ -29,3 +29,10 @@ func (object *balanceServiceImplementation) available() float64 {
 
 	return object.balance - totalAmount
 }
+
+func (object *balanceServiceImplementation) UpdateBalance(delta float64) {
+	object.mutex.Lock()
+	defer object.mutex.Unlock()
+
+	object.balance += delta
+}

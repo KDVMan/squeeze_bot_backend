@@ -2,7 +2,9 @@ package services_exchange_websocket
 
 import (
 	"backend/internal/enums"
+	services_helper "backend/pkg/services/helper"
 	"github.com/adshao/go-binance/v2/futures"
+	"time"
 )
 
 func (object *exchangeWebsocketServiceImplementation) SubscribeSymbol(symbol string) {
@@ -18,24 +20,49 @@ func (object *exchangeWebsocketServiceImplementation) SubscribeSymbol(symbol str
 	object.symbolMutex.Unlock()
 
 	go func() {
-		handler := func(event *futures.WsAggTradeEvent) {
-			object.quoteRepositoryService().UpdateQuote(symbol, enums.Interval1m, event)
-			object.botService().GetDealChannel() <- symbol
-		}
+		for {
+			doneChannel := make(chan struct{})
 
-		errorHandler := func(err error) {
-			object.loggerService().Error().Printf("websocket error for trade %s: %v", symbol, err)
-		}
+			handler := func(event *futures.WsAggTradeEvent) {
+				object.quoteRepositoryService().UpdateQuote(symbol, enums.Interval1m, event)
+				object.botService().GetDealChannel() <- symbol
+			}
 
-		_, stop, err := futures.WsAggTradeServe(symbol, handler, errorHandler)
-		if err != nil {
-			object.loggerService().Error().Printf("failed to subscribe to trade %s: %v", symbol, err)
-			return
-		}
+			errorHandler := func(err error) {
+				object.loggerService().Error().Printf("websocket error for %s: %v", symbol, err)
 
-		select {
-		case <-stopChannel:
-			stop <- struct{}{}
+				select {
+				case <-doneChannel:
+				default:
+					object.loggerService().Info().Printf("reconnect: %s", symbol)
+					close(doneChannel)
+				}
+			}
+
+			_, stop, err := futures.WsAggTradeServe(symbol, handler, errorHandler)
+			if err != nil {
+				object.loggerService().Error().Printf("failed to subscribe to %s: %v", symbol, err)
+				<-time.After(object.reconnectDelay)
+				continue
+			}
+
+			object.loggerService().Info().Printf("started: %s", symbol)
+
+			select {
+			case <-stopChannel:
+				object.loggerService().Info().Printf("shutdown: %s", symbol)
+				services_helper.SafeSendSignal(stop)
+				return
+			case <-object.doneChannel:
+				object.loggerService().Info().Printf("shutdown (system): %s", symbol)
+				services_helper.SafeSendSignal(stop)
+				return
+			case <-doneChannel:
+				object.loggerService().Info().Printf("reconnecting... %s", symbol)
+				services_helper.SafeSendSignal(stop)
+				<-time.After(object.reconnectDelay)
+				continue
+			}
 		}
 	}()
 }

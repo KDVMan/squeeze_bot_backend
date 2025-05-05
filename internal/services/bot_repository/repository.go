@@ -43,6 +43,24 @@ func (object *botRepositoryServiceImplementation) GetBySymbol(symbol string) ([]
 	return botsModels, exists
 }
 
+func (object *botRepositoryServiceImplementation) GetBySymbolAndID(symbol string, id uint) (*models_bot.BotModel, bool) {
+	object.mutex.Lock()
+	defer object.mutex.Unlock()
+
+	botsModels, exists := object.data[symbol]
+	if !exists {
+		return nil, false
+	}
+
+	for _, botModel := range botsModels {
+		if botModel.ID == id {
+			return botModel, true
+		}
+	}
+
+	return nil, false
+}
+
 func (object *botRepositoryServiceImplementation) GetAll() []*models_bot.BotModel {
 	object.mutex.Lock()
 	defer object.mutex.Unlock()

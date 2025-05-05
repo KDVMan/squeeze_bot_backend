@@ -20,7 +20,6 @@ func (object *ProviderService) BotService() services_interface_bot.BotService {
 			object.QuoteService,
 			object.QuoteRepositoryService,
 			object.BotRepositoryService,
-			object.UserService,
 			object.BalanceService,
 		)
 	}

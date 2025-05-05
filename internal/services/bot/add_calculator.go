@@ -86,7 +86,7 @@ func (object *botServiceImplementation) AddCalculator(request *models_bot.AddCal
 		tickSizeFactor++
 	}
 
-	status := enums_bot.StatusStop
+	status := enums_bot.StatusAdd
 
 	botModel = models_bot.BotModel{
 		Hash:           hash,
