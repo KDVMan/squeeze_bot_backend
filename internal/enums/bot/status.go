@@ -10,7 +10,6 @@ const (
 	StatusRun    Status = "run" // запущен (собраны свечи и подписан на монету)
 	StatusStop   Status = "stop"
 	StatusDelete Status = "delete"
-	StatusWait   Status = "wait" // защита, когда монеты льются
 )
 
 func (object Status) String() string {
@@ -27,7 +26,7 @@ func StatusValidate(field validator.FieldLevel) bool {
 
 func (object Status) StatusValid() bool {
 	switch object {
-	case StatusNew, StatusAdd, StatusRun, StatusStop, StatusDelete, StatusWait:
+	case StatusNew, StatusAdd, StatusRun, StatusStop, StatusDelete:
 		return true
 	default:
 		return false

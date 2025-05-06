@@ -65,4 +65,8 @@ func (object *requestServiceImplementation) init() {
 	if err := object.validate.RegisterValidation("botStatus", enums_bot.StatusValidate); err != nil {
 		return
 	}
+
+	if err := object.validate.RegisterValidation("botAction", enums_bot.ActionValidate); err != nil {
+		return
+	}
 }

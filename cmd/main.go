@@ -37,7 +37,9 @@ func run(providerService *services_provider.ProviderService, parentCtx context.C
 
 	providerService.UserService().Init()
 	providerService.BalanceService().InitBalance(providerService.UserService().GetBalance())
+	providerService.BotService().InitGuard()
 
+	go providerService.BotService().RunGuardChannel()
 	go providerService.BotService().RunAddDealChannel()
 	go providerService.OrderService().RunOrderChannel()
 	go providerService.BotService().RunDealChannel()

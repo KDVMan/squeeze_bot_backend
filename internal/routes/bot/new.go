@@ -30,6 +30,7 @@ func NewBotRoute(
 	route.router.Post("/add", route.add())
 	route.router.Post("/add_calculator", route.addCalculator())
 	route.router.Post("/update_status", route.updateStatus())
+	route.router.Post("/action", route.action())
 
 	return route
 }

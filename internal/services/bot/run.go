@@ -29,7 +29,7 @@ func (object *botServiceImplementation) RunChannel() {
 		}
 
 		object.quoteRepositoryService().Add(botModel.Symbol, quotes)
-		object.exchangeWebsocketService().SubscribeSymbol(botModel.Symbol)
+		object.exchangeWebsocketService().SubscribeSymbol(botModel.Symbol, false)
 		object.botRepositoryService().Add(botModel)
 
 		object.websocketService().GetBroadcastChannel() <- &models_channel.BroadcastChannelModel{

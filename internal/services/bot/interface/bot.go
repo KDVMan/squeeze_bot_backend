@@ -5,6 +5,7 @@ import (
 )
 
 type BotService interface {
+	InitGuard()
 	Add(*models_bot.AddRequestModel) error
 	AddCalculator(*models_bot.AddCalculatorRequestModel) error
 	LoadAll() []*models_bot.BotModel
@@ -21,4 +22,7 @@ type BotService interface {
 	Update(*models_bot.BotModel) error
 	UpdateParam(*models_bot.BotModel)
 	GetBotEventChannel() chan *models_bot.BotEventModel
+	RunGuardChannel()
+	GetGuardChannel() chan string
+	Action(*models_bot.ActionRequestModel) error
 }

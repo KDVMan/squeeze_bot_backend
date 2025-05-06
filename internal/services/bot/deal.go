@@ -32,10 +32,6 @@ func (object *botServiceImplementation) handleDeal(symbol string) {
 	prevQuote := quotes[len(quotes)-2]
 
 	for _, botModel := range botsModels {
-		if botModel.Busy {
-			continue
-		}
-
 		if botModel.Deal.StatusIsNull() {
 			var percentToPriceIn float64
 
@@ -56,7 +52,15 @@ func (object *botServiceImplementation) handleDeal(symbol string) {
 
 			if percentToPriceIn <= botModel.CurrentParam.TriggerStart && botModel.Deal.Status != enums_bot.DealStatusOpenLimit {
 				if !object.balanceService().Reserve(botModel.ID, botModel.Deposit) {
-					// log.Println("not enough balance", botModel.ID, botModel.Symbol, "deposit", botModel.Deposit)
+					continue
+				}
+
+				if object.isGuardActive(botModel.Symbol, botModel.TradeDirection) {
+					object.loggerService().Info().Printf("[GUARD] %s: skipping deal due to active stop %s",
+						botModel.Symbol,
+						botModel.TradeDirection,
+					)
+
 					continue
 				}
 

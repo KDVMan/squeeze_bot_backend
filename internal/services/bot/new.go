@@ -36,6 +36,7 @@ type botServiceImplementation struct {
 	dealChannel              chan string
 	addDealChannel           chan *models_bot.BotModel
 	botEventChannel          chan *models_bot.BotEventModel
+	guardChannel             chan string
 	commission               float64
 }
 
@@ -72,6 +73,7 @@ func NewBotService(
 		dealChannel:              make(chan string, 10000),
 		addDealChannel:           make(chan *models_bot.BotModel, 10000),
 		botEventChannel:          make(chan *models_bot.BotEventModel, 10000),
+		guardChannel:             make(chan string, 10000),
 		commission:               configService().GetConfig().Binance.FuturesCommission,
 	}
 }

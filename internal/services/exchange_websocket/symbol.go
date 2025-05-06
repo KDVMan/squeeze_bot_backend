@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func (object *exchangeWebsocketServiceImplementation) SubscribeSymbol(symbol string) {
+func (object *exchangeWebsocketServiceImplementation) SubscribeSymbol(symbol string, isGuard bool) {
 	object.symbolMutex.Lock()
 
 	if _, exists := object.symbolsSubscriptions[symbol]; exists {
@@ -25,7 +25,12 @@ func (object *exchangeWebsocketServiceImplementation) SubscribeSymbol(symbol str
 
 			handler := func(event *futures.WsAggTradeEvent) {
 				object.quoteRepositoryService().UpdateQuote(symbol, enums.Interval1m, event)
-				object.botService().GetDealChannel() <- symbol
+
+				if isGuard {
+					object.botService().GetGuardChannel() <- symbol
+				} else {
+					object.botService().GetDealChannel() <- symbol
+				}
 			}
 
 			errorHandler := func(err error) {
