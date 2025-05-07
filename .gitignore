@@ -47,4 +47,3 @@ TODO.txt
 .env
 go.sum
 backend.log
-config/config.yml

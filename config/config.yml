@@ -1,0 +1,21 @@
+logger:
+  use_file_on_dev: false
+  use_file_on_prod: true
+  error_file_name: "error.log"
+  info_file_name: "info.log"
+
+db:
+  path: "C:/Users/Denis/Downloads/squeeze_bot.db"
+
+http_server:
+  host: "127.0.0.1"
+  port: 8888
+  read_timeout: 60s
+  write_timeout: 60s
+  idle_timeout: 60s
+
+binance:
+  api_key: "P0sLNONTxZwfupWrQG4tIStS0N0J7vsAQeCXxwilzFuTFJPabIZpHrPVXFS7YRiI"
+  api_secret: "pchbPVhTwkZiN9OF5FSjryUnzSCo1rElcOIBq2vIpBHUmoRGqlONvgZeGxiwUe6W"
+  futures_limit: 1500
+  futures_commission: 0.02
