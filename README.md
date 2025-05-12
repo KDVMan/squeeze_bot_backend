@@ -27,7 +27,9 @@
 config/config.yaml
 
 binance:
+
 api_key: "P0sLNONTxZwfupW..........."
+
 api_secret: "pchbPVhTwkZiN9O..........."
 
 ----
