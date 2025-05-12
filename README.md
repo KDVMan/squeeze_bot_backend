@@ -1,3 +1,19 @@
+Список репозиториев:
+
+Фронтенд squeeze кальулятор :https://github.com/KDVMan/squeeze_calculator_frontend
+
+Бекенд squeeze калькулятор: https://github.com/KDVMan/squeeze_calculator_backend
+
+Фронтэнд squeeze бота для торговли: https://github.com/KDVMan/squeeze_bot_frontend
+
+Бекенд squeeze бота для торговли: https://github.com/KDVMan/squeeze_bot_backend
+
+----
+
+Информационное видео: https://www.youtube.com/watch?v=oWRoKbkZE0I
+
+----
+
 Бекенд для торгового бота сквизами (сервер), фронт тут: https://github.com/KDVMan/squeeze_bot_frontend
 
 Установка аналогичная как у калькулятора: https://github.com/KDVMan/squeeze_calculator_backend
