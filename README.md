@@ -2,6 +2,8 @@
 
 Установка аналогичная как у калькулятора: https://github.com/KDVMan/squeeze_calculator_backend
 
+Боты которые будут добавляться или в ручную или через calculator, будут появляться внизу в списке ботов
+
 Единственное для торговли задайте свои API ключи для binance:
 
 config/config.yaml
