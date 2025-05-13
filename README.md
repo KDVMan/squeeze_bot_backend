@@ -1,3 +1,7 @@
+Буду благодарен за подписку на мой телеграм канал: https://t.me/kdv_trade
+
+----
+
 Список репозиториев:
 
 Фронтенд squeeze кальулятор :https://github.com/KDVMan/squeeze_calculator_frontend
